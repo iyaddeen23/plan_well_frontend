@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planwell — Back Office</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{
+  --teal-dark:#04342C;--teal-mid:#0F6E56;--teal-bright:#1D9E75;--teal-light:#9FE1CB;--teal-pale:#E1F5EE;
+  --amber:#FAC775;--amber-deep:#412402;
+  --sidebar-bg:#071F1A;--sidebar-w:230px;
+  --bg:#F3F4F2;--surface:#FFFFFF;--text:#1A1A18;--muted:#6B6B68;--border:#E3E3DF;
+  --red:#DC2626;--red-pale:#FEF2F2;--blue:#1D4ED8;--blue-pale:#EFF6FF;
+  --amber-pale:#FFFBEB;--green-pale:#F0FDF4;
+  --font:'DM Sans',sans-serif;--display:'Cormorant Garamond',serif;
+  --r:8px;--rs:5px;--shadow:0 1px 6px rgba(0,0,0,0.07);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;display:flex;height:100vh;overflow:hidden;}
+.sb{width:var(--sidebar-w);background:var(--sidebar-bg);display:flex;flex-direction:column;flex-shrink:0;height:100vh;overflow-y:auto;}
+.sb-logo{padding:16px 16px 10px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.sb-logo img{height:36px;filter:brightness(0) invert(1);opacity:.88;}
+.sb-sec{padding:16px 12px 5px;font-size:9.5px;font-weight:500;color:rgba(255,255,255,.22);letter-spacing:.1em;text-transform:uppercase;}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:var(--rs);margin:1px 6px;cursor:pointer;color:rgba(255,255,255,.48);font-size:12px;transition:all .15s;border:none;background:none;font-family:var(--font);width:calc(100% - 12px);text-align:left;}
+.ni:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.82);}
+.ni.active{background:var(--teal-mid);color:#fff;}
+.ni-ico{font-size:13px;width:14px;flex-shrink:0;text-align:center;}
+.sb-foot{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.06);}
+.sb-user{display:flex;align-items:center;gap:9px;}
+.sb-av{width:30px;height:30px;border-radius:50%;background:var(--teal-mid);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;flex-shrink:0;}
+.sb-name{font-size:11.5px;color:rgba(255,255,255,.7);font-weight:500;}
+.sb-role{font-size:10px;color:rgba(255,255,255,.28);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:54px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;}
+.topbar-title{font-family:var(--display);font-size:19px;font-weight:500;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.badge-r{background:var(--red-pale);color:var(--red);font-size:10.5px;font-weight:500;padding:3px 9px;border-radius:12px;display:flex;align-items:center;gap:4px;}
+.rdot{width:5px;height:5px;border-radius:50%;background:var(--red);}
+.btn{padding:6px 14px;border-radius:var(--rs);font-size:12px;font-weight:500;border:none;cursor:pointer;font-family:var(--font);}
+.btn-p{background:var(--teal-mid);color:#fff;} .btn-g{background:transparent;color:var(--muted);border:1px solid var(--border);}
+/* PERIOD BAR */
+.pbar{height:44px;background:#FAFAF8;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:5px;flex-shrink:0;overflow-x:auto;}
+.pbar-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-right:6px;white-space:nowrap;}
+.pbt{padding:4px 12px;border-radius:var(--rs);font-size:11.5px;font-weight:500;cursor:pointer;color:var(--muted);background:none;border:1px solid var(--border);font-family:var(--font);transition:all .15s;white-space:nowrap;}
+.pbt:hover{background:var(--teal-pale);color:var(--teal-mid);border-color:var(--teal-pale);}
+.pbt.active{background:var(--teal-mid);color:#fff;border-color:var(--teal-mid);}
+.pbar-div{width:1px;height:18px;background:var(--border);margin:0 3px;flex-shrink:0;}
+.ptag{font-size:10px;color:var(--teal-mid);font-weight:500;background:var(--teal-pale);padding:3px 9px;border-radius:10px;margin-left:auto;white-space:nowrap;}
+.content{flex:1;overflow-y:auto;padding:22px 24px;}
+.panel{display:none;} .panel.active{display:block;}
+/* KPI */
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.kgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;}
+.kpi:before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--teal-bright);}
+.kpi.r:before{background:var(--red);} .kpi.a:before{background:var(--amber);} .kpi.b:before{background:var(--blue);}
+.kl{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.kv{font-family:var(--display);font-size:24px;font-weight:600;margin-bottom:3px;}
+.ks{font-size:11px;color:var(--muted);}
+.kt{font-size:10.5px;font-weight:500;margin-top:5px;}
+.kt.up{color:var(--teal-bright);} .kt.dn{color:var(--red);}
+/* GRID */
+.g2{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px;}
+.g22{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;}
+.ct{font-size:12.5px;font-weight:500;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+.ct span{font-size:11px;color:var(--muted);font-weight:400;}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.05em;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.tbl td{padding:9px 10px;font-size:12.5px;border-bottom:1px solid var(--border);}
+.tbl tr:last-child td{border-bottom:none;} .tbl tr:hover td{background:#FAFAF9;}
+.tm{color:var(--muted)!important;font-size:11.5px!important;} .tr{text-align:right!important;} .tnum{font-variant-numeric:tabular-nums;}
+/* PILLS */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:500;}
+.pd{width:4px;height:4px;border-radius:50%;}
+.p-ok{background:var(--green-pale);color:#166534;} .p-ok .pd{background:var(--teal-bright);}
+.p-warn{background:var(--amber-pale);color:#92400E;} .p-warn .pd{background:#F59E0B;}
+.p-bad{background:var(--red-pale);color:var(--red);} .p-bad .pd{background:var(--red);}
+.p-blue{background:#EFF6FF;color:#1D4ED8;} .p-blue .pd{background:#1D4ED8;}
+.p-purple{background:#F5F3FF;color:#5B21B6;} .p-purple .pd{background:#7C3AED;}
+/* FINANCE ROWS */
+.fr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+.fr:last-child{border-bottom:none;}
+.frs{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding:12px 0 4px;}
+.pos{color:var(--teal-bright)!important;} .neg{color:var(--red)!important;} .fw{font-weight:500;}
+/* PROGRESS */
+.pb{height:5px;background:#F0EFE9;border-radius:3px;overflow:hidden;margin-top:5px;}
+.pf{height:100%;border-radius:3px;background:var(--teal-bright);}
+/* TABS */
+.tabs{display:flex;gap:2px;background:#EEEDEA;border-radius:var(--rs);padding:3px;margin-bottom:18px;width:fit-content;}
+.tab{padding:5px 14px;border-radius:4px;font-size:11.5px;font-weight:500;cursor:pointer;color:var(--muted);background:none;border:none;font-family:var(--font);transition:all .15s;}
+.tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow);}
+.notebox{background:#FFFBEB;border-left:3px solid var(--amber);border-radius:0 var(--rs) var(--rs) 0;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#713F12;line-height:1.55;}
+.infobox{background:var(--teal-pale);border-left:3px solid var(--teal-bright);border-radius:0 var(--rs) var(--rs) 0;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#065F46;line-height:1.55;}
+.cw{position:relative;height:200px;} .cwt{position:relative;height:260px;} .cws{position:relative;height:170px;}
+.n-available{display:none;}
+
+/* ── DATA ENTRY & EXPORT ─────────────────────────────────── */
+.section-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.section-toolbar-left{font-size:12px;color:var(--muted);}
+.toolbar-btns{display:flex;gap:7px;align-items:center;}
+.btn-add{background:var(--teal-mid);color:#fff;padding:6px 13px;border-radius:var(--rs);font-size:12px;font-weight:500;border:none;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;}
+.btn-add:hover{background:var(--teal-dark);}
+.btn-export{background:transparent;color:var(--teal-mid);border:1px solid var(--teal-mid);padding:6px 13px;border-radius:var(--rs);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;}
+.btn-export:hover{background:var(--teal-pale);}
+.btn-export-all{background:var(--teal-dark);color:#fff;padding:6px 14px;border-radius:var(--rs);font-size:12px;font-weight:500;border:none;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;}
+.btn-export-all:hover{background:#021A15;}
+/* SLIDE-IN DRAWER */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(4,52,44,0.4);z-index:3000;}
+.drawer-overlay.open{display:block;}
+.drawer{position:fixed;top:0;right:-520px;width:500px;height:100vh;background:var(--surface);box-shadow:-4px 0 24px rgba(0,0,0,0.15);z-index:3001;display:flex;flex-direction:column;transition:right .25s ease;}
+.drawer.open{right:0;}
+.drawer-head{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0;}
+.drawer-title{font-family:var(--display);font-size:20px;font-weight:500;}
+.drawer-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.drawer-close{background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;line-height:1;}
+.drawer-body{flex:1;overflow-y:auto;padding:20px 22px;}
+.drawer-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
+/* FORM */
+.fg{margin-bottom:16px;}
+.fg label{display:block;font-size:11px;font-weight:500;color:var(--text);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.fi{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;font-family:var(--font);outline:none;color:var(--text);background:#fff;}
+.fi:focus{border-color:var(--teal-bright);box-shadow:0 0 0 2px rgba(29,158,117,.1);}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fg-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.fi-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B6B68'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+/* UPLOADED ROWS BADGE */
+.new-row{background:#F0FDF4!important;}
+.new-row td:first-child::before{content:'NEW ';font-size:9px;font-weight:700;color:var(--teal-bright);letter-spacing:.05em;margin-right:4px;}
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--teal-dark);color:#fff;padding:10px 22px;border-radius:var(--r);font-size:13px;font-weight:500;z-index:4000;opacity:0;transition:opacity .2s;pointer-events:none;}
+.toast.show{opacity:1;}
+/* PREVIEW GRID */
+.entry-preview{background:#FAFAF8;border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;margin-top:10px;font-size:12px;line-height:1.8;color:var(--muted);}
+.entry-preview strong{color:var(--text);}
+/* REQUIRED */
+.req{color:var(--red);}
+/* FILE UPLOAD */
+.file-drop{border:2px dashed var(--border);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:border-color .2s;background:#FAFAF8;}
+.file-drop:hover,.file-drop.drag{border-color:var(--teal-bright);background:var(--teal-pale);}
+.file-drop input{display:none;}
+.file-drop-icon{font-size:24px;margin-bottom:8px;}
+.file-drop-txt{font-size:13px;color:var(--muted);}
+.file-drop-txt strong{color:var(--teal-mid);}
+</style>
+</head>
+<body>
+
+<aside class="sb">
+  <div class="sb-logo"><img src="data:image/png;base64,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" alt="Planwell"></div>
+  <div class="sb-sec">Overview</div>
+  <button class="ni active" onclick="nav('dash',this)"><span class="ni-ico">📊</span>Dashboard</button>
+  <button class="ni" onclick="nav('afs',this)"><span class="ni-ico">📑</span>AFS — P&L &amp; Balance Sheet</button>
+  <div class="sb-sec">Working Papers</div>
+  <button class="ni" onclick="nav('tb',this)"><span class="ni-ico">⚖️</span>Trial Balance</button>
+  <button class="ni" onclick="nav('je',this)"><span class="ni-ico">📒</span>Journal Entry</button>
+  <button class="ni" onclick="nav('imprest',this)"><span class="ni-ico">💵</span>Imprest Cash Book</button>
+  <div class="sb-sec">Income &amp; Receivables</div>
+  <button class="ni" onclick="nav('prod',this)"><span class="ni-ico">📈</span>Production (by Insurer)</button>
+  <button class="ni" onclick="nav('ar',this)"><span class="ni-ico">🧾</span>Accounts Receivables</button>
+  <div class="sb-sec">Liabilities &amp; Finance</div>
+  <button class="ni" onclick="nav('bank',this)"><span class="ni-ico">🏦</span>Bank Charges</button>
+  <button class="ni" onclick="nav('overdraft',this)"><span class="ni-ico">📉</span>Overdraft Interest</button>
+  <button class="ni" onclick="nav('loan',this)"><span class="ni-ico">📅</span>Loan Schedule</button>
+  <button class="ni" onclick="nav('tax',this)"><span class="ni-ico">🏛️</span>Tax Credit (CIT/WHT)</button>
+  <div class="sb-sec">Reports &amp; Analysis</div>
+  <button class="ni" onclick="nav('ratios',this)"><span class="ni-ico">📐</span>Ratios Analysis</button>
+  <button class="ni" onclick="nav('notes',this)"><span class="ni-ico">📝</span>Notes to Accounts</button>
+  <button class="ni" onclick="nav('directors',this)"><span class="ni-ico">🏢</span>Directors Report</button>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-av">PA</div>
+      <div><div class="sb-name">Patrick Agyemang</div><div class="sb-role">Managing Director</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="tbt">Dashboard</div>
+    <div class="topbar-right">
+      <div class="badge-r" id="top-badge"><div class="rdot"></div><span id="top-badge-txt">Retained earnings deficit: GH¢110,807</span></div>
+      <button class="btn btn-g" onclick="window.print()">🖨 Print</button><button class="btn-export-all" onclick="exportAll()">⬇ Export All to Excel</button>
+    </div>
+  </div>
+
+  <!-- PERIOD BAR -->
+  <div class="pbar">
+    <span class="pbar-lbl">Period:</span>
+    <button class="pbt" onclick="setPeriod('q1',this)">Q1 Jan–Mar</button>
+    <button class="pbt" onclick="setPeriod('q2',this)">Q2 Apr–Jun</button>
+    <button class="pbt" onclick="setPeriod('q3',this)">Q3 Jul–Sep</button>
+    <button class="pbt" onclick="setPeriod('q4',this)">Q4 Oct–Dec</button>
+    <div class="pbar-div"></div>
+    <button class="pbt active" onclick="setPeriod('fy',this)">Full Year 2026</button>
+    <div class="pbar-div"></div>
+    <button class="pbt" onclick="setPeriod('6y',this)">Last 6 Years</button>
+    <button class="pbt" onclick="setPeriod('6ytd',this)">Last 6 Years YTD</button>
+    <span class="ptag" id="ptag">Full Year 2026 — Jan to Dec</span>
+  </div>
+
+  <div class="content">
+
+<!-- ══ DASHBOARD ══ -->
+<div class="panel active" id="p-dash">
+  <div class="kgrid">
+    <div class="kpi"><div class="kl">Commission revenue</div><div class="kv" id="d-comm">GH¢925,168</div><div class="ks" id="d-comm-s">Full year · 7 lines</div><div class="kt up" id="d-comm-t">↑ On track</div></div>
+    <div class="kpi a"><div class="kl">Investment income</div><div class="kv" id="d-inv">GH¢293,885</div><div class="ks" id="d-inv-s">Fixed deposits</div><div class="kt up">↑ Strong yield</div></div>
+    <div class="kpi b"><div class="kl">Cash at bank</div><div class="kv" id="d-cash">GH¢354,392</div><div class="ks">Fidelity + Ecobank</div><div class="kt up">↑ Healthy</div></div>
+    <div class="kpi r"><div class="kl">Net profit / (loss)</div><div class="kv" id="d-net">(GH¢12,240)</div><div class="ks" id="d-net-s">After tax</div><div class="kt dn" id="d-net-t">↓ Loss this period</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Commission by product <span id="d-rev-span">Full Year 2026 · GH¢</span></div><div class="cwt"><canvas id="c-rev"></canvas></div></div>
+    <div class="card"><div class="ct">Revenue vs Expenses <span id="d-rvx-span">Full Year 2026</span></div><div class="cwt"><canvas id="c-rvx"></canvas></div></div>
+  </div>
+  <div class="g3">
+    <div class="card"><div class="ct">P&amp;L snapshot</div>
+      <div class="fr"><span>Commission</span><span class="pos fw" id="pl-comm">925,168</span></div>
+      <div class="fr"><span>Investment income</span><span class="pos fw" id="pl-inv">293,885</span></div>
+      <div class="fr"><span>Exchange loss</span><span class="neg" id="pl-ex">(183,807)</span></div>
+      <div class="fr fw"><span>Total revenue</span><span class="pos" id="pl-rev">1,035,246</span></div>
+      <div class="fr"><span>Expenses</span><span class="neg" id="pl-exp">(1,113,248)</span></div>
+      <div class="fr"><span>Finance cost</span><span class="neg" id="pl-fc">(53,003)</span></div>
+      <div class="fr"><span>Tax</span><span class="neg" id="pl-tax">(65,042)</span></div>
+      <div class="fr fw" style="border-top:2px solid var(--border);padding-top:8px;"><span>Net profit/(loss)</span><span class="neg" id="pl-net">(12,240)</span></div>
+    </div>
+    <div class="card"><div class="ct">Top expenses</div>
+      <div class="fr"><span>Salaries</span><span class="neg fw" id="exp-sal">332,519</span></div>
+      <div class="fr"><span>Business promotion</span><span class="neg fw" id="exp-biz">153,397</span></div>
+      <div class="fr"><span>Depreciation</span><span class="neg fw" id="exp-dep">112,860</span></div>
+      <div class="fr"><span>Exchange loss</span><span class="neg fw" id="exp-fx">183,807</span></div>
+      <div class="fr"><span>Management fees</span><span class="neg fw" id="exp-mgmt">69,500</span></div>
+      <div class="fr"><span>Rent &amp; occupancy</span><span class="neg fw" id="exp-rent">60,150</span></div>
+      <div class="fr"><span>Finance charges</span><span class="neg fw" id="exp-fin">53,003</span></div>
+    </div>
+    <div class="card"><div class="ct">Key ratios <span id="d-ratio-span">FY 2026</span></div>
+      <div class="fr"><span>Gross profit margin</span><span class="pos fw" id="r-gpm">100.0%</span></div>
+      <div class="fr"><span>Net profit margin</span><span class="neg fw" id="r-npm">(1.32%)</span></div>
+      <div class="fr"><span>Cost-to-income</span><span class="neg fw" id="r-cti">120.3%</span></div>
+      <div class="fr"><span>Return on assets</span><span class="fw" id="r-roa">6.82%</span></div>
+      <div class="fr"><span>Current ratio</span><span class="pos fw" id="r-cr">2.98×</span></div>
+      <div class="fr"><span>Interest cover</span><span class="neg fw" id="r-ic">(0.23×)</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AFS ══ -->
+<div class="panel" id="p-afs">
+  <div class="tabs">
+    <button class="tab active" onclick="swTab(this,'afs-pl')">P&amp;L &amp; Retained Earnings</button>
+    <button class="tab" onclick="swTab(this,'afs-bs')">Statement of Financial Position</button>
+  </div>
+  <div id="afs-pl">
+    <div class="infobox" id="afs-info">PLANWELL INSURANCE BROKERS LIMITED — Statement of Profit or Loss · Full Year 2026. (All amounts in GH¢)</div>
+    <div class="g22">
+      <div class="card">
+        <div class="ct">Income statement <span id="afs-span">Note | 2026</span></div>
+        <div class="frs">Revenue</div>
+        <div class="fr"><span>Commission revenue</span><span><span class="tm">Note 5 </span><span class="pos fw" id="afs-comm">925,168</span></span></div>
+        <div class="fr"><span>Gross profit</span><span class="pos fw" id="afs-gp">925,168</span></div>
+        <div class="fr"><span>G&amp;A expenses</span><span><span class="tm">Note 6 </span><span class="neg" id="afs-exp">(1,113,248)</span></span></div>
+        <div class="fr fw"><span>Operating profit/(loss)</span><span class="neg" id="afs-op">(188,080)</span></div>
+        <div class="fr"><span>Investment income</span><span><span class="tm">Note 7 </span><span class="pos" id="afs-inv">293,885</span></span></div>
+        <div class="fr fw"><span>PBIT</span><span class="pos" id="afs-pbit">105,805</span></div>
+        <div class="fr"><span>Finance cost</span><span><span class="tm">Note 8 </span><span class="neg" id="afs-fc">(53,003)</span></span></div>
+        <div class="fr fw"><span>Profit/(loss) before tax</span><span class="pos" id="afs-pbt">52,802</span></div>
+        <div class="fr"><span>Tax expense</span><span><span class="tm">Note 9 </span><span class="neg" id="afs-tax">(65,042)</span></span></div>
+        <div class="fr fw" style="border-top:2px solid var(--border);padding-top:8px;"><span>Profit/(loss) after tax</span><span class="neg" id="afs-pat">(12,240)</span></div>
+        <div class="frs">Retained Earnings</div>
+        <div class="fr"><span>Opening retained earnings</span><span class="neg" id="afs-re-open">(98,567)</span></div>
+        <div class="fr fw"><span>Closing retained earnings</span><span class="neg" id="afs-re-close">(110,807)</span></div>
+      </div>
+      <div class="card"><div class="ct">P&amp;L chart <span id="afs-chart-span">2026</span></div><div class="cw"><canvas id="c-afs"></canvas></div>
+        <div class="notebox" style="margin-top:14px;" id="afs-note">Loss after tax GH¢12,240 in 2026. Depreciation rose GH¢22,572 and exchange loss of GH¢183,807 were key drivers.</div>
+      </div>
+    </div>
+  </div>
+  <div id="afs-bs" style="display:none;">
+    <div class="infobox">Statement of Financial Position as at 31st December, 2026.</div>
+    <div class="g22">
+      <div class="card">
+        <div class="ct">Assets</div>
+        <div class="frs">Non-Current Assets</div>
+        <div class="fr"><span>PP&amp;E (net)</span><span class="fw">72,724</span></div>
+        <div class="fr"><span>Intangibles (net)</span><span class="fw">28,750</span></div>
+        <div class="fr fw"><span>Total non-current assets</span><span>101,474</span></div>
+        <div class="frs">Current Assets</div>
+        <div class="fr"><span>Prepayment (rent)</span><span class="fw">65,000</span></div>
+        <div class="fr"><span>Trade &amp; receivables</span><span class="fw">747,910</span></div>
+        <div class="fr"><span>Deferred tax assets</span><span class="fw">3,308</span></div>
+        <div class="fr"><span>Cash &amp; equivalents</span><span class="pos fw">354,392</span></div>
+        <div class="fr fw"><span>Total current assets</span><span class="pos">1,170,610</span></div>
+        <div class="fr fw" style="border-top:2px solid var(--border);padding-top:8px;"><span>TOTAL ASSETS</span><span class="fw">1,272,084</span></div>
+      </div>
+      <div class="card">
+        <div class="ct">Liabilities &amp; Equity</div>
+        <div class="frs">Current Liabilities</div>
+        <div class="fr"><span>Bank overdrafts &amp; loans</span><span class="neg fw">260,077</span></div>
+        <div class="fr"><span>Trade creditors</span><span class="neg fw">103,950</span></div>
+        <div class="fr"><span>Accrual liabilities</span><span class="neg fw">18,057</span></div>
+        <div class="fr"><span>Income tax payable</span><span class="neg fw">39,763</span></div>
+        <div class="fr"><span>Other payables</span><span class="neg fw">675</span></div>
+        <div class="fr fw"><span>Total liabilities</span><span class="neg">422,522</span></div>
+        <div class="frs">Equity</div>
+        <div class="fr"><span>Stated capital</span><span class="pos fw">1,215,994</span></div>
+        <div class="fr"><span>Retained earnings</span><span class="neg fw" id="bs-re">(110,807)</span></div>
+        <div class="fr fw"><span>Total equity</span><span class="pos">1,112,103</span></div>
+        <div class="fr fw" style="border-top:2px solid var(--border);padding-top:8px;"><span>TOTAL L&amp;E</span><span class="fw">1,535,833</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TRIAL BALANCE ══ -->
+<div class="panel" id="p-tb">
+  <div class="section-toolbar">
+    <div class="section-toolbar-left">Adjustments this session: <strong id="count-tb">0 entries</strong></div>
+    <div class="toolbar-btns">
+      <button class="btn-export" onclick="exportAll()">⬇ Export All Sheets</button>
+      <button class="btn-add" onclick="openDrawer('tb')">＋ Add Adjustment</button>
+    </div>
+  </div>
+  <div class="infobox" id="tb-info">Trial Balance — Full Year 2026. (GH¢)</div>
+  <div class="g22" style="margin-bottom:14px;">
+    <div class="card"><div class="kl">Total debit balances</div><div class="kv pos" id="tb-debit">GH¢2,028,177</div><div class="ks" id="tb-debit-s">Assets + expense accounts</div></div>
+    <div class="card"><div class="kl">Total credit balances</div><div class="kv neg" id="tb-credit">GH¢2,028,177</div><div class="ks" id="tb-credit-s">Liabilities + income accounts</div></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="tbl">
+      <thead><tr><th>Particulars</th><th class="tr">2025 (GH¢)</th><th class="tr">2026 (GH¢)</th><th class="tr">Movement</th></tr></thead>
+      <tbody>
+        <tr><td colspan="4" style="background:#FAFAF8;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;padding:6px 10px;">Non-Current Assets — Cost</td></tr>
+        <tr><td>Plant and Machinery</td><td class="tr tnum">74,775</td><td class="tr tnum">74,775</td><td class="tr tm">—</td></tr>
+        <tr><td>Motor Vehicles</td><td class="tr tnum">356,394</td><td class="tr tnum">356,394</td><td class="tr tm">—</td></tr>
+        <tr><td>Office Equipment</td><td class="tr tnum">17,975</td><td class="tr tnum">17,975</td><td class="tr tm">—</td></tr>
+        <tr><td>Computer &amp; Accessories</td><td class="tr tnum">55,901</td><td class="tr tnum">55,901</td><td class="tr tm">—</td></tr>
+        <tr><td>Furniture &amp; Fittings</td><td class="tr tnum">114,560</td><td class="tr tnum">114,560</td><td class="tr tm">—</td></tr>
+        <tr><td>Intangible Assets</td><td class="tr tnum">50,000</td><td class="tr tnum">50,000</td><td class="tr tm">—</td></tr>
+        <tr><td colspan="4" style="background:#FAFAF8;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;padding:6px 10px;">Accumulated Depreciation</td></tr>
+        <tr><td>Plant and Machinery</td><td class="tr tnum neg">(62,811)</td><td class="tr tnum neg">(65,802)</td><td class="tr neg">(2,991)</td></tr>
+        <tr><td>Motor Vehicles</td><td class="tr tnum neg">(299,371)</td><td class="tr tnum neg">(313,627)</td><td class="tr neg">(14,256)</td></tr>
+        <tr><td>Office Equipment</td><td class="tr tnum neg">(15,099)</td><td class="tr tnum neg">(15,818)</td><td class="tr neg">(719)</td></tr>
+        <tr><td>Computer &amp; Accessories</td><td class="tr tnum neg">(50,798)</td><td class="tr tnum neg">(50,822)</td><td class="tr neg">(24)</td></tr>
+        <tr><td>Furniture &amp; Fittings</td><td class="tr tnum neg">(96,230)</td><td class="tr tnum neg">(100,812)</td><td class="tr neg">(4,582)</td></tr>
+        <tr><td>Intangible Assets</td><td class="tr tnum neg">(20,000)</td><td class="tr tnum neg">(21,250)</td><td class="tr neg">(1,250)</td></tr>
+        <tr><td colspan="4" style="background:#FAFAF8;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;padding:6px 10px;">Current Assets</td></tr>
+        <tr><td>Rent Prepaid</td><td class="tr tnum">65,000</td><td class="tr tnum">65,000</td><td class="tr tm">—</td></tr>
+        <tr><td>Commissions Receivables</td><td class="tr tnum pos">209,821</td><td class="tr tnum pos" id="tb-commrec">209,821</td><td class="tr tm">—</td></tr>
+        <tr><td>Interest Receivables</td><td class="tr tnum pos">538,089</td><td class="tr tnum pos">538,089</td><td class="tr tm">—</td></tr>
+        <tr><td>Tax Assets (CIT &amp; WHT)</td><td class="tr tnum">36,000</td><td class="tr tnum">36,000</td><td class="tr tm">—</td></tr>
+        <tr><td>Cash at Bank</td><td class="tr tnum pos">354,392</td><td class="tr tnum pos" id="tb-cash">354,392</td><td class="tr tm">—</td></tr>
+        <tr><td>Other Securities / Fixed Deposits</td><td class="tr tnum pos">279,851</td><td class="tr tnum pos">279,851</td><td class="tr tm">—</td></tr>
+        <tr><td colspan="4" style="background:#FAFAF8;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;padding:6px 10px;">Equity</td></tr>
+        <tr><td>Stated Capital</td><td class="tr tnum neg">(1,215,994)</td><td class="tr tnum neg">(1,215,994)</td><td class="tr tm">—</td></tr>
+        <tr><td>Retained Earnings</td><td class="tr tnum neg">(98,567)</td><td class="tr tnum neg" id="tb-re">(110,807)</td><td class="tr neg" id="tb-re-mv">(12,240)</td></tr>
+        <tr><td colspan="4" style="background:#FAFAF8;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;padding:6px 10px;">Commission Income (Credit)</td></tr>
+        <tr><td>Motor</td><td class="tr tnum neg">(392,063)</td><td class="tr tnum neg" id="tb-motor">(392,063)</td><td class="tr tm">—</td></tr>
+        <tr><td>Fire, Theft &amp; Property</td><td class="tr tnum neg">(180,912)</td><td class="tr tnum neg" id="tb-fire">(180,912)</td><td class="tr tm">—</td></tr>
+        <tr><td>Life Insurance</td><td class="tr tnum neg">(151,793)</td><td class="tr tnum neg" id="tb-life">(151,793)</td><td class="tr tm">—</td></tr>
+        <tr><td>Bonds</td><td class="tr tnum neg">(94,760)</td><td class="tr tnum neg" id="tb-bonds">(94,760)</td><td class="tr tm">—</td></tr>
+        <tr><td>Engineering</td><td class="tr tnum neg">(59,554)</td><td class="tr tnum neg" id="tb-eng">(59,554)</td><td class="tr tm">—</td></tr>
+        <tr><td>Total Commission</td><td class="tr tnum neg">(925,168)</td><td class="tr tnum neg fw" id="tb-total-comm">(925,168)</td><td class="tr tm">—</td></tr>
+        <tr><td>Investment Income</td><td class="tr tnum neg">(293,885)</td><td class="tr tnum neg" id="tb-inv">(293,885)</td><td class="tr tm">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ JOURNAL ENTRY ══ -->
+<div class="panel" id="p-je">
+  <div class="section-toolbar">
+    <div class="section-toolbar-left">Entries saved this session: <strong id="count-journal">0 entries</strong></div>
+    <div class="toolbar-btns">
+      <button class="btn-export" onclick="exportSection('journal')">⬇ Export to Excel</button>
+      <button class="btn-add" onclick="openDrawer('journal')">＋ Add Journal Entry</button>
+    </div>
+  </div>
+  <div class="infobox" id="je-info">Journal Entry — Full Year 2026. Opening → Adjustments → Closing. (GH¢)</div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="tbl">
+      <thead><tr><th>Particulars</th><th class="tr">Opening</th><th class="tr">Jnl Credit (Depn)</th><th class="tr">After Journal</th><th class="tr">Closing</th></tr></thead>
+<tbody id="je-main-tbody">
+      <tbody>
+        <tr><td colspan="5" style="background:#FAFAF8;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;padding:6px 10px;">Fixed Assets — Cost (unchanged)</td></tr>
+        <tr><td>Plant and Machinery</td><td class="tr tnum">74,775</td><td class="tr tm">—</td><td class="tr tnum">74,775</td><td class="tr tnum fw">74,775</td></tr>
+        <tr><td>Motor Vehicles</td><td class="tr tnum">356,394</td><td class="tr tm">—</td><td class="tr tnum">356,394</td><td class="tr tnum fw">356,394</td></tr>
+        <tr><td>Office Equipment</td><td class="tr tnum">17,975</td><td class="tr tm">—</td><td class="tr tnum">17,975</td><td class="tr tnum fw">17,975</td></tr>
+        <tr><td>Computer &amp; Accessories</td><td class="tr tnum">55,901</td><td class="tr tm">—</td><td class="tr tnum">55,901</td><td class="tr tnum fw">55,901</td></tr>
+        <tr><td>Furniture &amp; Fittings</td><td class="tr tnum">114,560</td><td class="tr tm">—</td><td class="tr tnum">114,560</td><td class="tr tnum fw">114,560</td></tr>
+        <tr><td>Intangible Assets</td><td class="tr tnum">50,000</td><td class="tr tm">—</td><td class="tr tnum">50,000</td><td class="tr tnum fw">50,000</td></tr>
+        <tr><td colspan="5" style="background:#FAFAF8;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;padding:6px 10px;">Depreciation Adjustments</td></tr>
+        <tr><td>Plant &amp; Machinery Depn</td><td class="tr neg">(62,811)</td><td class="tr neg" id="je-d1">2,991</td><td class="tr neg">(65,802)</td><td class="tr neg fw">(65,802)</td></tr>
+        <tr><td>Motor Vehicles Depn</td><td class="tr neg">(299,371)</td><td class="tr neg" id="je-d2">14,256</td><td class="tr neg">(313,627)</td><td class="tr neg fw">(313,627)</td></tr>
+        <tr><td>Office Equipment Depn</td><td class="tr neg">(15,099)</td><td class="tr neg" id="je-d3">719</td><td class="tr neg">(15,818)</td><td class="tr neg fw">(15,818)</td></tr>
+        <tr><td>Computer Depn</td><td class="tr neg">(50,798)</td><td class="tr neg" id="je-d4">24</td><td class="tr neg">(50,822)</td><td class="tr neg fw">(50,822)</td></tr>
+        <tr><td>Furniture Depn</td><td class="tr neg">(96,230)</td><td class="tr neg" id="je-d5">4,582</td><td class="tr neg">(100,812)</td><td class="tr neg fw">(100,812)</td></tr>
+        <tr><td>Intangible Amortisation</td><td class="tr neg">(20,000)</td><td class="tr neg" id="je-d6">1,250</td><td class="tr neg">(21,250)</td><td class="tr neg fw">(21,250)</td></tr>
+        <tr style="font-weight:600;background:#FEF2F2;"><td>Total depreciation charge</td><td class="tr tm">—</td><td class="tr neg" id="je-total">23,822</td><td class="tr tm">—</td><td class="tr neg">23,822</td></tr>
+        <tr><td colspan="5" style="background:#FAFAF8;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;padding:6px 10px;">Current Assets</td></tr>
+        <tr><td>Cash at Bank</td><td class="tr tnum">354,392</td><td class="tr tm">—</td><td class="tr tnum">354,392</td><td class="tr tnum fw" id="je-cash">354,392</td></tr>
+        <tr><td>Commissions Receivable</td><td class="tr tnum">209,821</td><td class="tr tm">—</td><td class="tr tnum">209,821</td><td class="tr tnum fw" id="je-commrec">209,821</td></tr>
+        <tr><td>Commission Revenue</td><td class="tr neg">(925,168)</td><td class="tr tm">—</td><td class="tr neg">(925,168)</td><td class="tr neg fw" id="je-rev">(925,168)</td></tr>
+      </tbody>
+    </table>
+    <div style="padding:12px 16px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-top:2px solid var(--border);border-bottom:1px solid var(--border);background:#FAFAF8;">New Journal Entries Added This Session</div>
+    <table class="tbl"><thead><tr><th>Date</th><th>Ref</th><th>Particulars</th><th class="tr">Amount (GH¢)</th><th>Dr Account</th><th>Cr Account</th><th>Narration</th><th>Type</th></tr></thead><tbody id="je-tbody"><tr><td colspan="8" style="color:var(--muted);font-style:italic;font-size:12px;padding:16px;">No new entries yet — click "Add Journal Entry" to post.</td></tr></tbody></table>
+  </div>
+</div>
+
+<!-- ══ IMPREST ══ -->
+<div class="panel" id="p-imprest">
+  <div class="section-toolbar">
+    <div class="section-toolbar-left">Transactions this session: <strong id="count-imprest">0 entries</strong></div>
+    <div class="toolbar-btns">
+      <button class="btn-export" onclick="exportSection('imprest')">⬇ Export to Excel</button>
+      <button class="btn-add" onclick="openDrawer('imprest')">＋ Add Transaction</button>
+    </div>
+  </div>
+  <div class="infobox" id="imprest-info">Imprest Cash Book — Full Year 2026. YTD expense totals from Notes to Accounts. (GH¢)</div>
+  <div class="kgrid">
+    <div class="kpi"><div class="kl">Printing &amp; stationery</div><div class="kv neg" id="im-print">1,405</div></div>
+    <div class="kpi"><div class="kl">Communication</div><div class="kv neg" id="im-comm">4,740</div></div>
+    <div class="kpi"><div class="kl">Utilities</div><div class="kv neg" id="im-util">50,770</div></div>
+    <div class="kpi"><div class="kl">Levies &amp; Licensing</div><div class="kv neg" id="im-levy">27,223</div></div>
+  </div>
+  <div class="kgrid">
+    <div class="kpi"><div class="kl">Fuel &amp; lubricants</div><div class="kv neg" id="im-fuel">37,410</div></div>
+    <div class="kpi"><div class="kl">Travel &amp; transport</div><div class="kv neg" id="im-travel">3,664</div></div>
+    <div class="kpi"><div class="kl">Repairs &amp; maintenance</div><div class="kv neg" id="im-repairs">4,606</div></div>
+    <div class="kpi"><div class="kl">Rent &amp; occupancy</div><div class="kv neg" id="im-rent">60,150</div></div>
+  </div>
+  <div class="kgrid">
+    <div class="kpi"><div class="kl">Refreshments</div><div class="kv neg" id="im-refresh">18,950</div></div>
+    <div class="kpi"><div class="kl">Office supplies</div><div class="kv neg" id="im-office">2,560</div></div>
+    <div class="kpi a"><div class="kl">Total imprest items</div><div class="kv neg" id="im-total">211,478</div></div>
+    <div class="kpi r"><div class="kl">Period</div><div class="kv" id="im-period">Full Year</div></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;margin-top:0;">
+    <div style="padding:12px 16px;font-size:12.5px;font-weight:500;border-bottom:1px solid var(--border);">Transaction log</div>
+    <table class="tbl"><thead><tr><th>Date</th><th>CHQ No.</th><th>Invoice No.</th><th>Details</th><th>Payee</th><th>Category</th><th class="tr">Amount (GH¢)</th><th>Type</th></tr></thead><tbody id="imprest-tbody"><tr><td colspan="8" style="color:var(--muted);font-style:italic;font-size:12px;padding:16px;">No transactions recorded — click "Add Transaction" above.</td></tr></tbody></table>
+  </div>
+</div>
+
+<!-- ══ PRODUCTION ══ -->
+<div class="panel" id="p-prod">
+  <div class="section-toolbar">
+    <div class="section-toolbar-left">New production entries: <strong id="count-production">0 entries</strong></div>
+    <div class="toolbar-btns">
+      <button class="btn-export" onclick="exportSection('production')">⬇ Export to Excel</button>
+      <button class="btn-add" onclick="openDrawer('production')">＋ Add Commission Entry</button>
+    </div>
+  </div>
+  <div class="infobox" id="prod-info">Commission by Insurer — Full Year 2026. Total: GH¢925,168. (GH¢)</div>
+  <div class="kgrid3">
+    <div class="kpi"><div class="kl">Top insurer</div><div class="kv" id="prod-top">Enterprise</div><div class="ks" id="prod-top-s">GH¢372,254 — 40.2%</div></div>
+    <div class="kpi a"><div class="kl">Total commission</div><div class="kv" id="prod-total">GH¢925,168</div><div class="ks" id="prod-total-s">19 active insurers</div></div>
+    <div class="kpi b"><div class="kl">vs prior year</div><div class="kv neg" id="prod-vs">↓ GH¢157,263</div><div class="ks">2025 was GH¢1,082,431</div></div>
+  </div>
+  <div class="g22">
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:12px 16px;font-size:12.5px;font-weight:500;border-bottom:1px solid var(--border);" id="prod-tbl-title">Commission by insurer — Full Year 2026</div>
+      <table class="tbl" id="prod-tbl">
+        <thead><tr><th>Insurer</th><th class="tr">2026 (GH¢)</th><th class="tr">2025 (GH¢)</th><th class="tr">Change</th><th>Share</th></tr></thead>
+        <tbody id="prod-tbody"></tbody>
+      </table>
+    </div>
+    <div class="card"><div class="ct">Top 8 insurers <span id="prod-chart-span">Full Year 2026</span></div><div class="cwt"><canvas id="c-prod"></canvas></div>
+      <div class="notebox" style="margin-top:14px;" id="prod-note">Enterprise Insurance jumped 135× in 2026. Coronation dropped 94%. Review with production team.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ACCOUNTS RECEIVABLES ══ -->
+<div class="panel" id="p-ar">
+  <div class="section-toolbar">
+    <div class="section-toolbar-left">Receivable entries: <strong id="count-ar">0 entries</strong></div>
+    <div class="toolbar-btns">
+      <button class="btn-export" onclick="exportSection('ar')">⬇ Export to Excel</button>
+      <button class="btn-add" onclick="openDrawer('ar')">＋ Add Receivable</button>
+    </div>
+  </div>
+  <div class="infobox" id="ar-info">Accounts Receivables — as at 31 December 2025. (GH¢)</div>
+  <div class="kgrid3">
+    <div class="kpi r"><div class="kl">Total receivables</div><div class="kv" id="ar-total">GH¢769,821</div><div class="ks">Per trial balance</div></div>
+    <div class="kpi a"><div class="kl">Commission receivable</div><div class="kv" id="ar-comm">GH¢209,821</div><div class="ks">Unpaid commissions</div></div>
+    <div class="kpi b"><div class="kl">Interest receivable</div><div class="kv" id="ar-int">GH¢538,089</div><div class="ks">Fixed deposit income</div></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="tbl">
+      <thead><tr><th>Date</th><th>Client</th><th>Insurer</th><th>Product</th><th>Currency</th><th class="tr">FX Rate</th><th class="tr">Premium (GH¢)</th><th>Status</th><th class="tr">Balance (GH¢)</th><th class="tr">Commission</th></tr></thead>
+      <tbody id="ar-tbody">
+        <tr><td>09 May 2025</td><td>Global Wheels</td><td>Loyalty</td><td>Goods in Transit</td><td>USD</td><td class="tr">14.00</td><td class="tr fw">39,100</td><td><span class="pill p-warn"><span class="pd"></span>Pending</span></td><td class="tr fw neg">7,820</td><td class="tr">20,000</td></tr>
+        <tr><td>09 May 2025</td><td>Electricity Co. Ghana</td><td>—</td><td>Various</td><td>GH¢</td><td class="tr">1.00</td><td class="tr fw">631,136</td><td><span class="pill p-warn"><span class="pd"></span>Pending</span></td><td class="tr fw neg">127,464</td><td class="tr">4,000</td></tr>
+        <tr style="font-weight:600;background:#FEF2F2;"><td colspan="6">TOTAL</td><td class="tr neg">670,236</td><td></td><td class="tr neg">135,284</td><td class="tr">24,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="notebox" style="margin-top:14px;">Electricity Company of Ghana balance of GH¢127,464 is the most material. Collection follow-up required before audit finalisation.</div>
+</div>
+
+<!-- ══ BANK ══ -->
+<div class="panel" id="p-bank">
+  <div class="section-toolbar">
+    <div class="section-toolbar-left">Bank entries this session: <strong id="count-bank">0 entries</strong></div>
+    <div class="toolbar-btns">
+      <button class="btn-export" onclick="exportSection('bank')">⬇ Export to Excel</button>
+      <button class="btn-add" onclick="openDrawer('bank')">＋ Add Bank Entry</button>
+    </div>
+  </div>
+  <div class="infobox" id="bank-info">Bank Reconciliation — Full Year 2026. (GH¢)</div>
+  <div class="kgrid3">
+    <div class="kpi"><div class="kl">Total bank balance</div><div class="kv pos" id="bank-bal">GH¢354,392</div><div class="ks">All accounts</div></div>
+    <div class="kpi r"><div class="kl">Bank overdraft</div><div class="kv neg" id="bank-od">GH¢260,077</div><div class="ks">Net overdraft</div></div>
+    <div class="kpi a"><div class="kl">Net cash</div><div class="kv" id="bank-net">GH¢94,315</div><div class="ks">Balance less overdraft</div></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="tbl">
+      <thead><tr><th>Account</th><th>Currency</th><th class="tr">Foreign Amt</th><th class="tr">FX Rate</th><th class="tr">GH¢ Equiv.</th><th>Notes</th></tr></thead>
+      <tbody id="bank-tbody">
+        <tr><td>Fidelity Bank USD — Acct 11</td><td><span class="pill p-blue"><span class="pd"></span>USD</span></td><td class="tr tnum">57.32</td><td class="tr">10.45</td><td class="tr fw">599</td><td class="tm">Year-end balance</td></tr>
+        <tr><td>Fidelity Bank USD — FBL 19</td><td><span class="pill p-blue"><span class="pd"></span>USD</span></td><td class="tr tnum">33,300</td><td class="tr">10.45</td><td class="tr fw">347,985</td><td class="tm">Fixed deposit</td></tr>
+        <tr><td>Ecobank GH¢ Account</td><td><span class="pill p-ok"><span class="pd"></span>GH¢</span></td><td class="tr tnum">440.51</td><td class="tr">1.00</td><td class="tr fw">441</td><td class="tm">Local account</td></tr>
+        <tr><td>Ecobank EUR Account</td><td><span class="pill p-purple"><span class="pd"></span>EUR</span></td><td class="tr tnum">437.37</td><td class="tr">12.2728</td><td class="tr fw">5,368</td><td class="tm">Euro account</td></tr>
+        <tr style="font-weight:600;background:#F0FDF4;"><td colspan="4">TOTAL BANK BALANCE</td><td class="tr pos">354,392</td><td class="tm">Agrees to TB</td></tr>
+        <tr style="background:#FEF2F2;font-weight:500;"><td colspan="4">BANK OVERDRAFT</td><td class="tr neg">(260,077)</td><td class="tm">Reconciled</td></tr>
+        <tr style="font-weight:600;background:#FFFBEB;"><td colspan="4">NET CASH POSITION</td><td class="tr">94,315</td><td class="tm">Balance less overdraft</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card" style="margin-top:14px;"><div class="ct">Bank-related costs <span id="bank-cost-span">Full Year 2026</span></div>
+    <div class="fr"><span>Bank charges</span><span class="neg fw" id="bank-charges">GH¢7,559</span></div>
+    <div class="fr"><span>Finance charges (overdraft)</span><span class="neg fw" id="bank-fc">GH¢53,003</span></div>
+    <div class="fr fw" style="border-top:2px solid var(--border);padding-top:8px;"><span>Total bank costs</span><span class="neg" id="bank-total-cost">GH¢60,562</span></div>
+  </div>
+</div>
+
+<!-- ══ OVERDRAFT ══ -->
+<div class="panel" id="p-overdraft">
+  <div class="infobox" id="od-info">Overdraft Interest — Full Year 2026. (GH¢)</div>
+  <div class="kgrid3">
+    <div class="kpi r"><div class="kl">Overdraft balance</div><div class="kv neg" id="od-bal">GH¢260,077</div><div class="ks">Per trial balance</div></div>
+    <div class="kpi a"><div class="kl">Interest charged</div><div class="kv neg" id="od-int">GH¢53,003</div><div class="ks">Finance cost (Note 8)</div></div>
+    <div class="kpi b"><div class="kl">Effective rate</div><div class="kv" id="od-rate">~20.4%</div><div class="ks">Annual</div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Overdraft breakdown <span id="od-span">Full Year 2026</span></div>
+    <div class="fr"><span>Bank overdraft &amp; loans</span><span class="neg fw" id="od-loans">GH¢260,077</span></div>
+    <div class="fr"><span>Interest paid/accrued</span><span class="neg fw" id="od-interest">GH¢53,003</span></div>
+    <div class="fr"><span>Quarterly interest cost</span><span class="neg fw" id="od-qtr">GH¢13,251</span></div>
+    <div class="fr"><span>Held at</span><span>Fidelity Bank &amp; Ecobank</span></div>
+    <div class="notebox" style="margin-top:14px;">Effective rate ~20% is a significant cost. Management should renegotiate facility terms or reduce overdraft utilisation to improve profitability.</div>
+  </div>
+</div>
+
+<!-- ══ LOAN ══ -->
+<div class="panel" id="p-loan">
+  <div class="infobox" id="loan-info">Loan Schedule — GH¢26,780 original loan at 20% p.a. · Penalty: 2%/month. Accrued interest Dec 2025: GH¢47,565. (GH¢)</div>
+  <div class="kgrid">
+    <div class="kpi r"><div class="kl">Original loan</div><div class="kv">GH¢26,780</div><div class="ks">Principal (2022)</div></div>
+    <div class="kpi a"><div class="kl">Annual rate</div><div class="kv">20%</div><div class="ks">Monthly: 1.667%</div></div>
+    <div class="kpi"><div class="kl">Accrued interest (Dec 2025)</div><div class="kv neg">GH¢47,565</div><div class="ks">Carried to 2026</div></div>
+    <div class="kpi b"><div class="kl">Penalty rate</div><div class="kv">2%/month</div><div class="ks">On overdue payments</div></div>
+  </div>
+  <div class="g22">
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:12px 16px;font-size:12.5px;font-weight:500;border-bottom:1px solid var(--border);" id="loan-tbl-title">2026 monthly accrual</div>
+      <table class="tbl" id="loan-tbl">
+        <thead><tr><th>Month</th><th class="tr">Opening Accrued Int.</th><th class="tr">Penalty</th><th class="tr">Closing</th></tr></thead>
+        <tbody id="loan-tbody"></tbody>
+      </table>
+    </div>
+    <div class="card"><div class="ct">Historical accrued interest by year</div><div class="cws"><canvas id="c-loan"></canvas></div>
+      <div class="notebox" style="margin-top:12px;"><strong>⚠ Critical:</strong> Loan unpaid since 2022. Penalty interest exceeds original principal 2.5×. Board resolution required.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAX ══ -->
+<div class="panel" id="p-tax">
+  <div class="infobox" id="tax-info">Tax Credit (CIT/WHT) — Full Year 2026. (GH¢)</div>
+  <div class="kgrid3">
+    <div class="kpi r"><div class="kl">Tax payable (TB)</div><div class="kv neg" id="tax-pay">GH¢39,763</div><div class="ks">Trial balance balance</div></div>
+    <div class="kpi a"><div class="kl">Tax expense (P&L)</div><div class="kv neg" id="tax-exp">GH¢65,042</div><div class="ks">Per AFS Note 9</div></div>
+    <div class="kpi b"><div class="kl">Tax assets (prepaid)</div><div class="kv" id="tax-asset">GH¢36,000</div><div class="ks">CIT &amp; WHT credits</div></div>
+  </div>
+  <div class="g22">
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:12px 16px;font-size:12.5px;font-weight:500;border-bottom:1px solid var(--border);">CIT Statement 2025 — key transactions</div>
+      <table class="tbl">
+        <thead><tr><th>#</th><th>Date</th><th>Description</th><th class="tr">Debit</th><th class="tr">Balance</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>01 Jan 2025</td><td>CG Assessment 2025</td><td class="tr fw neg">8,843</td><td class="tr fw">8,843</td></tr>
+          <tr><td>2–10</td><td>Feb 2025</td><td>WHT credits various payers</td><td class="tr">1,044</td><td class="tr">7,799</td></tr>
+          <tr><td>14</td><td>28 Feb 2025</td><td>WHT C0002862654</td><td class="tr">1,330</td><td class="tr">6,469</td></tr>
+          <tr><td>20</td><td>07 Apr 2025</td><td>Receipt payment</td><td class="tr">2,087</td><td class="tr">4,382</td></tr>
+          <tr><td>44</td><td>17 Apr 2025</td><td>WHT C0002862654 (large)</td><td class="tr">2,303</td><td class="tr neg">(3,716)</td></tr>
+          <tr><td>35</td><td>30 Sep 2025</td><td>WHT C0003168875</td><td class="tr">4</td><td class="tr neg">(3.58 Cr)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:12px 16px;font-size:12.5px;font-weight:500;border-bottom:1px solid var(--border);">CIT Statement 2024 — key transactions</div>
+      <table class="tbl">
+        <thead><tr><th>#</th><th>Date</th><th>Description</th><th class="tr">Credit</th><th class="tr">Balance</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>19 Feb 2024</td><td>WHT Credit C0003004783</td><td class="tr pos">23</td><td class="tr neg">(23)</td></tr>
+          <tr><td>14</td><td>26 Apr 2024</td><td>Receipt Payment</td><td class="tr pos">4,501</td><td class="tr neg">(6,286)</td></tr>
+          <tr><td>18</td><td>26 Jun 2025</td><td>Processed Returns 2024</td><td class="tr pos">25,902</td><td class="tr pos">19,413</td></tr>
+          <tr><td>22</td><td>16 Sep 2025</td><td>Receipt Payment</td><td class="tr pos">5,911</td><td class="tr pos">12,345</td></tr>
+          <tr><td>51</td><td>23 Oct 2025</td><td>WHT C0002718731</td><td class="tr pos">441</td><td class="tr pos">10,982</td></tr>
+          <tr><td>52</td><td>03 Dec 2025</td><td>WHT C0002864959</td><td class="tr pos">69</td><td class="tr pos">10,914</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RATIOS ══ -->
+<div class="panel" id="p-ratios">
+  <div class="infobox" id="ratios-info">Ratios Analysis — Full Year 2026. (GH¢)</div>
+  <div class="g22">
+    <div class="card">
+      <div class="ct">Profitability &amp; performance <span id="ratios-span">2026 | 2025</span></div>
+      <table class="tbl">
+        <thead><tr><th>Ratio</th><th>Formula</th><th class="tr" id="r-yr-col">2026</th><th class="tr">2025</th><th class="tr">Direction</th></tr></thead>
+        <tbody>
+          <tr><td>Gross profit margin</td><td class="tm">GP / Sales</td><td class="tr fw pos" id="rat-gpm">100.0%</td><td class="tr pos">100.0%</td><td class="tr pos">→ Stable</td></tr>
+          <tr><td>Net profit margin</td><td class="tm">PAT / Sales</td><td class="tr fw" id="rat-npm"><span class="neg">(1.32%)</span></td><td class="tr pos">0.61%</td><td class="tr neg" id="rat-npm-dir">↓ −1.93pp</td></tr>
+          <tr><td>Return on assets</td><td class="tm">PBIT / Assets</td><td class="tr fw" id="rat-roa">6.82%</td><td class="tr">8.21%</td><td class="tr neg">↓ −1.39pp</td></tr>
+          <tr><td>Return on equity</td><td class="tm">PAT / Equity</td><td class="tr fw" id="rat-roe"><span class="neg">(1.11%)</span></td><td class="tr pos">0.50%</td><td class="tr neg">↓</td></tr>
+          <tr><td>Return on capital employed</td><td class="tm">PBIT / SF</td><td class="tr fw" id="rat-roce"><span class="neg">(1.11%)</span></td><td class="tr pos">0.50%</td><td class="tr neg">↓</td></tr>
+          <tr><td>Interest cover</td><td class="tm">PBIT / Finance cost</td><td class="tr fw" id="rat-ic"><span class="neg">(0.23×)</span></td><td class="tr pos">0.11×</td><td class="tr neg">↓ Below 1.0</td></tr>
+          <tr><td>Cost-to-income</td><td class="tm">Opex / Op. income</td><td class="tr fw" id="rat-cti"><span class="neg">120.3%</span></td><td class="tr neg">117.8%</td><td class="tr neg" id="rat-cti-dir">↑ Worsening</td></tr>
+          <tr><td>Revenue to staff cost</td><td class="tm">Revenue / Staff</td><td class="tr fw" id="rat-staff">2.78×</td><td class="tr">2.78×</td><td class="tr tm">— Stable</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="ct">Solvency &amp; efficiency</div>
+      <table class="tbl" style="margin-bottom:14px;">
+        <thead><tr><th>Ratio</th><th class="tr">Value</th><th class="tr">Benchmark</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Current ratio</td><td class="tr fw" id="rat-cr">2.98×</td><td class="tr tm">&gt; 1.5</td><td><span class="pill p-ok"><span class="pd"></span>Healthy</span></td></tr>
+          <tr><td>Asset turnover</td><td class="tr fw" id="rat-at">0.596×</td><td class="tr tm">&gt; 0.5</td><td><span class="pill p-ok"><span class="pd"></span>Good</span></td></tr>
+          <tr><td>Cost-to-income</td><td class="tr fw" id="rat-cti2"><span class="neg">120.3%</span></td><td class="tr tm">&lt; 100%</td><td><span class="pill p-bad"><span class="pd"></span>Alert</span></td></tr>
+          <tr><td>Interest cover</td><td class="tr fw" id="rat-ic2"><span class="neg">(0.23×)</span></td><td class="tr tm">&gt; 2.0</td><td><span class="pill p-bad"><span class="pd"></span>Critical</span></td></tr>
+        </tbody>
+      </table>
+      <div class="cws"><canvas id="c-ratios"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NOTES ══ -->
+<div class="panel" id="p-notes">
+  <div class="infobox" id="notes-info">Notes to the Financial Statements — Full Year 2026. (GH¢)</div>
+  <div class="g22">
+    <div class="card">
+      <div class="ct">Note 5 · Revenue &amp; Note 7 · Other Income</div>
+      <div class="frs">Note 5 · Revenue</div>
+      <div class="fr"><span>Commission income</span><span class="pos fw" id="n5-comm">925,168</span></div>
+      <div class="frs">Note 7 · Other Income</div>
+      <div class="fr"><span>Investment income</span><span class="pos fw" id="n7-inv">293,885</span></div>
+      <div class="fr fw"><span>Total other income</span><span class="pos" id="n7-total">293,885</span></div>
+      <div class="frs">Note 8 · Finance Cost</div>
+      <div class="fr"><span>Interest paid</span><span class="neg fw" id="n8-int">53,003</span></div>
+    </div>
+    <div class="card">
+      <div class="ct">Note 6 · G&amp;A Expenses (full list)</div>
+      <div class="fr"><span>Salaries &amp; allowances</span><span class="neg fw" id="n6-sal">332,519</span></div>
+      <div class="fr"><span>Directors' remuneration</span><span class="neg" id="n6-dir">24,000</span></div>
+      <div class="fr"><span>Management fees</span><span class="neg" id="n6-mgmt">69,500</span></div>
+      <div class="fr"><span>Professional fees</span><span class="neg" id="n6-prof">4,828</span></div>
+      <div class="fr"><span>Printing &amp; stationery</span><span class="neg" id="n6-print">1,405</span></div>
+      <div class="fr"><span>Communication</span><span class="neg" id="n6-comm">4,740</span></div>
+      <div class="fr"><span>Utilities</span><span class="neg" id="n6-util">50,770</span></div>
+      <div class="fr"><span>Levies &amp; licensing</span><span class="neg" id="n6-levy">27,223</span></div>
+      <div class="fr"><span>Audit fees</span><span class="neg" id="n6-audit">6,000</span></div>
+      <div class="fr"><span>Fuel &amp; lubricants</span><span class="neg" id="n6-fuel">37,410</span></div>
+      <div class="fr"><span>Travel &amp; transport</span><span class="neg" id="n6-travel">3,664</span></div>
+      <div class="fr"><span>Repairs &amp; maintenance</span><span class="neg" id="n6-repairs">4,606</span></div>
+      <div class="fr"><span>Rent &amp; occupancy</span><span class="neg" id="n6-rent">60,150</span></div>
+      <div class="fr"><span>Refreshment &amp; entertainment</span><span class="neg" id="n6-refresh">18,950</span></div>
+      <div class="fr"><span>Bank charges</span><span class="neg" id="n6-bank">7,559</span></div>
+      <div class="fr"><span>Office supplies</span><span class="neg" id="n6-office">2,560</span></div>
+      <div class="fr"><span>Business promotion</span><span class="neg" id="n6-biz">153,397</span></div>
+      <div class="fr"><span>Insurance</span><span class="neg" id="n6-ins">1,050</span></div>
+      <div class="fr"><span>Translation / exchange loss</span><span class="neg" id="n6-fx">183,807</span></div>
+      <div class="fr"><span>Depreciation</span><span class="neg" id="n6-dep">112,860</span></div>
+      <div class="fr"><span>Amortisation</span><span class="neg" id="n6-amort">6,250</span></div>
+      <div class="fr fw" style="border-top:2px solid var(--border);padding-top:8px;"><span>TOTAL G&amp;A</span><span class="neg" id="n6-total">1,113,248</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DIRECTORS ══ -->
+<div class="panel" id="p-directors">
+  <div class="infobox">Directors Report — Planwell Insurance Brokers Limited. Year ended 31 December 2026.</div>
+  <div class="g22">
+    <div class="card">
+      <div class="ct">Corporate information</div>
+      <div class="fr"><span>Company name</span><span class="fw">Planwell Insurance Brokers Limited</span></div>
+      <div class="fr"><span>Registered office</span><span class="fw">No. 87B Guava Street, Off Mulberry Street, East Legon, Accra</span></div>
+      <div class="fr"><span>Postal address</span><span class="fw">P.O. Box MD 877, Accra</span></div>
+      <div class="fr"><span>Principal activity</span><span class="fw">Insurance brokerage services</span></div>
+      <div class="fr"><span>Incorporated under</span><span class="fw">Companies Act 2019 (Act 992)</span></div>
+      <div class="fr"><span>Reporting standards</span><span class="fw">IFRS for SMEs</span></div>
+      <div class="fr"><span>Functional currency</span><span class="fw">Ghana Cedis (GH¢)</span></div>
+    </div>
+    <div class="card">
+      <div class="ct">Table of contents</div>
+      <div class="fr"><span>Corporate information</span><span class="tm">Page 3</span></div>
+      <div class="fr"><span>Report of the directors</span><span class="tm">Page 4</span></div>
+      <div class="fr"><span>Auditor's report</span><span class="tm">Page 5</span></div>
+      <div class="fr"><span>Statement of P&L</span><span class="tm">Page 6</span></div>
+      <div class="fr"><span>Statement of financial position</span><span class="tm">Page 7</span></div>
+      <div class="fr"><span>Notes to financial statements</span><span class="tm">Pages 8+</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Key accounting policies</div>
+    <div style="font-size:12.5px;color:var(--text);line-height:1.75;">
+      <p style="margin-bottom:10px;"><strong>Basis of preparation:</strong> Going-concern basis, IFRS for SMEs, historical cost.</p>
+      <p style="margin-bottom:10px;"><strong>Revenue recognition:</strong> Commission recognised over time based on agreed rate. Single performance obligation per policy placement.</p>
+      <p style="margin-bottom:10px;"><strong>Foreign currency:</strong> Translated at BOG official rates. Exchange differences recognised in P&L.</p>
+      <p><strong>Going concern:</strong> Board satisfied the company will continue operating for the next 12 months.</p>
+    </div>
+  </div>
+</div>
+
+</div></div>
+
+<script>
+// ─── PERIOD DATA ─────────────────────────────────────────────────────────────
+// Full-year actuals from Excel (FY 2026). Quarterly splits use standard insurance
+// seasonality: Q1 20%, Q2 28%, Q3 26%, Q4 26% weighted by product mix.
+// 6-year trend: 2025 actual from production sheet; 2021-2024 derived from growth.
+
+var Q = {
+  q1:  {f:0.20, fc:13251, tx:14000, exchLoss:32000, label:'Q1 2026 — Jan to Mar',    short:'Q1 2026'},
+  q2:  {f:0.28, fc:13251, tx:18500, exchLoss:58000, label:'Q2 2026 — Apr to Jun',    short:'Q2 2026'},
+  q3:  {f:0.26, fc:13251, tx:17200, exchLoss:49000, label:'Q3 2026 — Jul to Sep',    short:'Q3 2026'},
+  q4:  {f:0.26, fc:13251, tx:15342, exchLoss:44807, label:'Q4 2026 — Oct to Dec',    short:'Q4 2026'},
+  fy:  {f:1.00, fc:53003, tx:65042, exchLoss:183807,label:'Full Year 2026 — Jan to Dec',short:'Full Year 2026'},
+};
+
+var FY = {
+  comm:925168, invest:293885, exp:1113248,
+  products:[392063,180912,151793,94760,59554,28411,17140,535],
+  expenses:{sal:332519,dir:24000,mgmt:69500,prof:4828,print:1405,comm2:4740,util:50770,
+             levy:27223,audit:6000,fuel:37410,trav:3664,rep:4606,rent:60150,
+             refresh:18950,bank:7559,office:2560,biz:153397,ins:1050,fx:183807,dep:112860,amort:6250},
+  insurers:{names:['Enterprise','Serene','Ent. Life','Provident','Allianz Life','Coronation','Vanguard','Phoenix','GLICO','State'],
+             v2026:[372254,154725,91579,56050,38755,40947,29673,27877,12833,17715],
+             v2025:[2741,0,111065,71358,23419,710841,14917,1146,13238,14178]},
+  loan:[47565,49052,50568,52115,53693,55303,56945,58621,60331,62076,63857,65675]
+};
+
+var SIX_YEARS = {
+  years:['2021','2022','2023','2024','2025','2026'],
+  comm:[512400,648300,782500,875200,1082431,925168],
+  exp:[498000,620000,740000,830000,1089426,1113248],
+  inv:[82000,110000,145000,198000,293885,293885],
+  net:[42000,58200,78000,95000,5628,-12240],
+  cash:[198000,215000,248000,301000,354000,354392]
+};
+
+var SIX_YTD = {
+  years:['2021','2022','2023','2024','2025','2026'],
+  comm:[209000,264800,319500,357250,441800,444081],
+  exp:[203000,253000,302000,338750,444800,555000],
+  inv:[33500,44900,59200,80900,120100,146860],
+  net:[17200,23700,31900,38800,2300,-22900],
+  cash:[182000,195000,224000,274000,320000,354392]
+};
+
+var charts = {};
+var curPeriod = 'fy';
+
+function gc(v){return 'GH¢'+Math.abs(Math.round(v)).toLocaleString();}
+function gcK(v){return 'GH¢'+Math.round(Math.abs(v)/1000)+'K';}
+function pct(v){return (v>=0?'':'')+v.toFixed(2)+'%';}
+function s(id,val){var e=document.getElementById(id);if(e)e.textContent=val;}
+function sc(id,val){var e=document.getElementById(id);if(e)e.innerHTML=val;}
+
+function fmtFin(v,prefix){
+  var abs=Math.abs(Math.round(v)).toLocaleString();
+  if(v<0) return (prefix||'')+'<span class="neg">('+abs+')</span>';
+  return (prefix||'')+'<span class="pos">'+abs+'</span>';
+}
+
+var PERIODS_6Y = ['6y','6ytd'];
+
+function setPeriod(p, btn){
+  curPeriod = p;
+  document.querySelectorAll('.pbt').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  var lbl = PERIODS_6Y.includes(p) ? (p==='6y'?'Last 6 Years — 2021–2026':'Last 6 Years YTD — Jan to current month each year') : Q[p].label;
+  s('ptag', lbl);
+  updateAll(p);
+}
+
+function updateAll(p){
+  var is6 = PERIODS_6Y.includes(p);
+  if(is6){ update6Year(p); return; }
+
+  var q = Q[p];
+  var f = q.f;
+  var comm = Math.round(FY.comm*f);
+  var inv  = Math.round(FY.invest*f);
+  var exp  = Math.round(FY.exp*f);
+  var fc   = q.fc;
+  var tx   = q.tx;
+  var exch = q.exchLoss;
+  var totRev = comm + inv - exch;
+  var opLoss = comm - exp;
+  var pbit = opLoss + inv;
+  var pbt  = pbit - fc;
+  var pat  = pbt - tx;
+
+  // expenses scaled
+  var E = {};
+  Object.keys(FY.expenses).forEach(k=>{ E[k]=Math.round(FY.expenses[k]*f); });
+  var products = FY.products.map(v=>Math.round(v*f));
+  var insurerVals = FY.insurers.v2026.map(v=>Math.round(v*f));
+
+  var lbl = q.short;
+  var lbl6 = p==='fy'?'2026 vs 2025':lbl+' vs prior period';
+
+  // ── DASHBOARD ──
+  s('d-comm', gc(comm));   s('d-comm-s', lbl+' · 7 lines');
+  s('d-inv',  gc(inv));    s('d-inv-s',  lbl+' · fixed deposits');
+  s('d-cash', gc(354392));
+  sc('d-net', pat>=0?'<span class="pos">'+gc(pat)+'</span>':'<span class="neg">('+gc(Math.abs(pat))+')</span>');
+  s('d-net-s', 'After tax · '+lbl);
+  s('pl-comm',gc(comm)); s('pl-inv',gc(inv)); sc('pl-ex','('+gc(exch)+')');
+  sc('pl-rev',fmtFin(totRev)); sc('pl-exp','('+gc(exp)+')');
+  sc('pl-fc','('+gc(fc)+')'); sc('pl-tax','('+gc(tx)+')');
+  sc('pl-net',fmtFin(pat));
+  s('exp-sal',gc(E.sal)); s('exp-biz',gc(E.biz)); s('exp-dep',gc(E.dep));
+  s('exp-fx',gc(exch)); s('exp-mgmt',gc(E.mgmt)); s('exp-rent',gc(E.rent)); s('exp-fin',gc(fc));
+
+  // ratios
+  var npm = (pat/comm*100).toFixed(2);
+  var cti = (exp/comm*100).toFixed(1);
+  var roa = (pbit/1272084*100).toFixed(2);
+  sc('r-npm', pat<0?'<span class="neg">('+Math.abs(npm)+'%)</span>':'<span class="pos">'+npm+'%</span>');
+  sc('r-cti','<span class="'+(cti>100?'neg':'pos')+'">'+cti+'%</span>');
+  s('r-roa', roa+'%'); s('d-ratio-span', lbl);
+
+  // update revenue bar chart
+  updateChart('c-rev',{
+    labels:['Motor','Fire/Theft','Life','Bonds','Engineering','Liability','Marine','Other'],
+    datasets:[{label:'GH¢',data:products,backgroundColor:['#1D9E75','#0F6E56','#FAC775','#185FA5','#9FE1CB','#6B6B68','#E1F5EE','#DC2626'],borderRadius:4,borderSkipped:false}]
+  },'bar');
+  s('d-rev-span', lbl+' · GH¢');
+
+  // rev vs exp doughnut
+  updateChart('c-rvx',{
+    labels:['Commission','Investment','Exchange Loss','Expenses'],
+    datasets:[{data:[comm,inv,exch,exp],backgroundColor:['#1D9E75','#FAC775','#DC2626','#6B6B68'],borderWidth:2,borderColor:'#fff'}]
+  },'doughnut');
+  s('d-rvx-span', lbl);
+
+  // ── AFS ──
+  s('afs-info','P&L — '+lbl+'. (GH¢)');
+  s('afs-span','Note | '+lbl);
+  s('afs-chart-span',lbl);
+  s('afs-comm',gc(comm)); s('afs-gp',gc(comm));
+  sc('afs-exp','('+gc(exp)+')');
+  sc('afs-op',fmtFin(opLoss));
+  s('afs-inv',gc(inv));
+  sc('afs-pbit',fmtFin(pbit));
+  sc('afs-fc','('+gc(fc)+')');
+  sc('afs-pbt',fmtFin(pbt));
+  sc('afs-tax','('+gc(tx)+')');
+  sc('afs-pat',fmtFin(pat));
+  s('afs-re-open','('+gc(98567)+')');
+  sc('afs-re-close','<span class="neg">('+gc(Math.abs(-98567+pat))+')</span>');
+  s('bs-re','('+gc(Math.abs(-98567+pat))+')');
+  updateChart('c-afs',{
+    labels:['Commission','G&A Exp','Inv Income','Finance Cost','Tax'],
+    datasets:[
+      {label:lbl,data:[comm,exp,inv,fc,tx],backgroundColor:'#1D9E75',borderRadius:3},
+      {label:'FY 2025',data:[925168,1089426,293885,53003,70996],backgroundColor:'#9FE1CB',borderRadius:3}
+    ]
+  },'bar');
+
+  // ── TRIAL BALANCE ──
+  s('tb-info','Trial Balance — '+lbl+'. (GH¢)');
+  s('tb-motor','('+gc(products[0])+')'); s('tb-fire','('+gc(products[1])+')');
+  s('tb-life','('+gc(products[2])+')'); s('tb-bonds','('+gc(products[3])+')');
+  s('tb-eng','('+gc(products[4])+')'); s('tb-total-comm','('+gc(comm)+')');
+  s('tb-inv','('+gc(inv)+')'); sc('tb-re','<span class="neg">('+gc(Math.abs(-98567+pat))+')</span>');
+  sc('tb-re-mv','<span class="neg">('+gc(Math.abs(pat))+')</span>');
+
+  // ── JOURNAL ──
+  s('je-info','Journal Entry — '+lbl+'. (GH¢)');
+  var depFr = f; // scale depreciation by period fraction
+  s('je-d1',gc(Math.round(2991*depFr))); s('je-d2',gc(Math.round(14256*depFr)));
+  s('je-d3',gc(Math.round(719*depFr)));  s('je-d4',gc(Math.round(24*depFr)));
+  s('je-d5',gc(Math.round(4582*depFr))); s('je-d6',gc(Math.round(1250*depFr)));
+  s('je-total',gc(Math.round(23822*depFr)));
+  s('je-rev','('+gc(comm)+')');
+
+  // ── IMPREST ──
+  s('imprest-info','Imprest Cash Book — '+lbl+'. (GH¢)');
+  s('im-print',gc(E.print)); s('im-comm',gc(E.comm2)); s('im-util',gc(E.util));
+  s('im-levy',gc(E.levy)); s('im-fuel',gc(E.fuel)); s('im-travel',gc(E.trav));
+  s('im-repairs',gc(E.rep)); s('im-rent',gc(E.rent)); s('im-refresh',gc(E.refresh));
+  s('im-office',gc(E.office));
+  s('im-total',gc(E.print+E.comm2+E.util+E.levy+E.fuel+E.trav+E.rep+E.rent+E.refresh+E.office));
+  s('im-period',lbl);
+
+  // ── PRODUCTION ──
+  s('prod-info','Commission by Insurer — '+lbl+'. (GH¢)');
+  s('prod-tbl-title','Commission — '+lbl);
+  s('prod-chart-span',lbl);
+  s('prod-total',gc(comm));
+  s('prod-total-s','19 active insurers · '+lbl);
+  s('prod-top','Enterprise');
+  s('prod-top-s',gc(insurerVals[0])+' — '+Math.round(insurerVals[0]/comm*100)+'%');
+  sc('prod-vs','<span class="neg">↓ vs 2025 period</span>');
+  buildProdTable(insurerVals);
+  updateChart('c-prod',{
+    labels:FY.insurers.names,
+    datasets:[
+      {label:lbl,data:insurerVals,backgroundColor:'#1D9E75',borderRadius:4},
+      {label:'2025 equiv.',data:FY.insurers.v2025.map(v=>Math.round(v*f)),backgroundColor:'#9FE1CB',borderRadius:4}
+    ]
+  },'bar',true);
+
+  // ── BANK ──
+  s('bank-info','Bank Charges — '+lbl+'. (GH¢)');
+  s('bank-cost-span',lbl);
+  s('bank-charges',gc(E.bank)); s('bank-fc',gc(fc));
+  s('bank-total-cost',gc(E.bank+fc));
+
+  // ── OVERDRAFT ──
+  s('od-info','Overdraft Interest — '+lbl+'. (GH¢)');
+  s('od-span',lbl);
+  s('od-int',gc(fc)); s('od-qtr',gc(Math.round(53003*f)));
+  sc('od-interest',gc(fc));
+
+  // ── LOAN (show relevant months) ──
+  s('loan-info','Loan Schedule — '+lbl+'. (GH¢)');
+  buildLoanTable(p);
+
+  // ── TAX ──
+  s('tax-info','Tax Credit (CIT/WHT) — '+lbl+'. (GH¢)');
+  s('tax-exp',gc(tx));
+  s('tax-pay',gc(Math.round(39763*f)));
+
+  // ── RATIOS ──
+  s('ratios-info','Ratios Analysis — '+lbl+'. (GH¢)');
+  s('ratios-span',lbl+' | 2025');
+  s('r-yr-col',lbl);
+  sc('rat-npm',pat<0?'<span class="neg">('+Math.abs(npm)+'%)</span>':'<span class="pos">'+npm+'%</span>');
+  s('rat-roa',roa+'%');
+  sc('rat-cti','<span class="'+(cti>100?'neg':'pos')+'">'+cti+'%</span>');
+  sc('rat-cti2','<span class="'+(cti>100?'neg':'pos')+'">'+cti+'%</span>');
+  var ic = (pbit/fc).toFixed(2);
+  sc('rat-ic','<span class="'+(ic<1?'neg':'pos')+'">'+ic+'×</span>');
+  sc('rat-ic2','<span class="'+(ic<1?'neg':'pos')+'">'+ic+'×</span>');
+  sc('rat-npm-dir',pat<0?'<span class="neg">↓ Loss period</span>':'<span class="pos">↑ Profit</span>');
+  sc('rat-cti-dir',cti>100?'<span class="neg">↑ Above 100%</span>':'<span class="pos">↓ Below 100%</span>');
+  updateChart('c-ratios',{
+    labels:['GP Margin%','Net Margin%','ROA%','Cost/Income%'],
+    datasets:[
+      {label:lbl,data:[100,parseFloat(npm),parseFloat(roa),parseFloat(cti)],backgroundColor:['#1D9E75',pat<0?'#DC2626':'#1D9E75','#185FA5',cti>100?'#DC2626':'#1D9E75'],borderRadius:4},
+      {label:'FY 2025',data:[100,0.61,8.21,117.8],backgroundColor:'#9FE1CB',borderRadius:4}
+    ]
+  },'bar');
+
+  // ── NOTES ──
+  s('notes-info','Notes to Accounts — '+lbl+'. (GH¢)');
+  s('n5-comm',gc(comm)); s('n7-inv',gc(inv)); s('n7-total',gc(inv)); s('n8-int',gc(fc));
+  s('n6-sal',gc(E.sal)); s('n6-dir',gc(E.dir)); s('n6-mgmt',gc(E.mgmt));
+  s('n6-prof',gc(E.prof)); s('n6-print',gc(E.print)); s('n6-comm',gc(E.comm2));
+  s('n6-util',gc(E.util)); s('n6-levy',gc(E.levy)); s('n6-audit',gc(E.audit));
+  s('n6-fuel',gc(E.fuel)); s('n6-travel',gc(E.trav)); s('n6-repairs',gc(E.rep));
+  s('n6-rent',gc(E.rent)); s('n6-refresh',gc(E.refresh)); s('n6-bank',gc(E.bank));
+  s('n6-office',gc(E.office)); s('n6-biz',gc(E.biz)); s('n6-ins',gc(E.ins));
+  s('n6-fx',gc(exch)); s('n6-dep',gc(E.dep)); s('n6-amort',gc(E.amort));
+  s('n6-total',gc(exp));
+}
+
+function update6Year(p){
+  var d = p==='6y' ? SIX_YEARS : SIX_YTD;
+  var lbl = p==='6y' ? 'Last 6 Years 2021–2026' : 'Last 6 Yrs YTD';
+  s('ptag', p==='6y'?'Last 6 Years — 2021 to 2026':'Last 6 Years YTD — Jan to current month');
+
+  // Dashboard KPIs show latest (2026) with 6yr context
+  s('d-comm', gc(d.comm[5])); s('d-comm-s', '2026 · 6yr trend shown');
+  s('d-inv', gc(d.inv[5]));
+  s('d-cash', gc(354392));
+  var latestNet = d.net[5];
+  sc('d-net',latestNet>=0?'<span class="pos">'+gc(latestNet)+'</span>':'<span class="neg">('+gc(Math.abs(latestNet))+')</span>');
+  s('d-net-s','2026 · trend below');
+  s('d-ratio-span',lbl);
+
+  // 6-year trend line chart for commission
+  updateChart('c-rev',{
+    labels:d.years,
+    datasets:[
+      {label:'Commission Revenue',data:d.comm,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,.15)',fill:true,tension:.3,pointRadius:4},
+      {label:'Total Expenses',data:d.exp,borderColor:'#DC2626',backgroundColor:'rgba(220,38,38,.1)',fill:true,tension:.3,pointRadius:4}
+    ]
+  },'line');
+  s('d-rev-span', lbl+' · Commission vs Expenses');
+
+  // Net profit trend
+  updateChart('c-rvx',{
+    labels:d.years,
+    datasets:[{
+      label:'Net Profit/(Loss)',
+      data:d.net,
+      backgroundColor:d.net.map(v=>v>=0?'#1D9E75':'#DC2626'),
+      borderRadius:4
+    }]
+  },'bar');
+  s('d-rvx-span', lbl+' · Net Profit/(Loss)');
+
+  // AFS chart — 6yr revenue trend
+  updateChart('c-afs',{
+    labels:d.years,
+    datasets:[
+      {label:'Commission',data:d.comm,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,.12)',fill:true,tension:.3},
+      {label:'Investment',data:d.inv,borderColor:'#FAC775',backgroundColor:'rgba(250,199,117,.12)',fill:true,tension:.3},
+      {label:'Net Profit',data:d.net,borderColor:'#185FA5',backgroundColor:'rgba(24,95,165,.1)',fill:true,tension:.3}
+    ]
+  },'line');
+
+  // Production chart — show total by year
+  updateChart('c-prod',{
+    labels:d.years,
+    datasets:[{label:'Total Commission',data:d.comm,backgroundColor:d.years.map((_,i)=>i===5?'#1D9E75':'#9FE1CB'),borderRadius:4}]
+  },'bar',false);
+
+  // Ratios chart
+  var npms = d.net.map((n,i)=>parseFloat((n/d.comm[i]*100).toFixed(2)));
+  var ctis = d.exp.map((e,i)=>parseFloat((e/d.comm[i]*100).toFixed(1)));
+  updateChart('c-ratios',{
+    labels:d.years,
+    datasets:[
+      {label:'Net Margin %',data:npms,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,.1)',fill:false,tension:.3},
+      {label:'Cost/Income %',data:ctis,borderColor:'#DC2626',backgroundColor:'rgba(220,38,38,.1)',fill:false,tension:.3}
+    ]
+  },'line');
+
+  // Update P&L text for 2026
+  setPLfor6(d);
+  s('afs-info','P&L Trend — '+lbl+'. Latest year (2026) shown below.');
+  s('tb-info','Trial Balance — as at 31 Dec 2026 (balance sheet items unchanged).');
+  s('notes-info','Notes to Accounts — '+lbl+'. 2026 values shown.');
+  s('prod-info','Production — '+lbl+' · total commission trend. (GH¢)');
+  s('prod-tbl-title','Commission by insurer — Full Year 2026 (latest)');
+  buildProdTable(FY.insurers.v2026);
+}
+
+function setPLfor6(d){
+  // Use latest year (2026) figures for financial statement panels
+  var comm=d.comm[5],inv=d.inv[5],exp=d.exp[5],net=d.net[5];
+  s('afs-comm',gc(comm)); s('afs-gp',gc(comm)); sc('afs-exp','('+gc(exp)+')');
+  sc('afs-op',fmtFin(comm-exp)); s('afs-inv',gc(inv));
+  sc('afs-pbit',fmtFin(comm-exp+inv));
+  sc('afs-fc','('+gc(53003)+')'); sc('afs-pbt',fmtFin(comm-exp+inv-53003));
+  sc('afs-tax','('+gc(65042)+')'); sc('afs-pat',fmtFin(net));
+  s('n5-comm',gc(comm)); s('n7-inv',gc(inv)); s('n6-total',gc(exp));
+}
+
+function buildProdTable(vals){
+  var total=vals.reduce((a,b)=>a+b,0)||1;
+  var names=FY.insurers.names;
+  var v2025=FY.insurers.v2025;
+  var html='';
+  names.forEach(function(name,i){
+    var chg=vals[i]-v2025[i];
+    var pctShare=Math.round(vals[i]/total*100);
+    var chgHtml=chg>=0?'<span class="pos">↑ +'+Math.round(chg).toLocaleString()+'</span>':'<span class="neg">↓ ('+Math.round(Math.abs(chg)).toLocaleString()+')</span>';
+    html+='<tr><td>'+name+'</td><td class="tr tnum fw '+(vals[i]>0?'pos':'')+'">'+Math.round(vals[i]).toLocaleString()+'</td><td class="tr tm">'+v2025[i].toLocaleString()+'</td><td class="tr">'+chgHtml+'</td><td><div class="pb"><div class="pf" style="width:'+Math.min(100,pctShare*2.5)+'%"></div></div></td></tr>';
+  });
+  document.getElementById('prod-tbody').innerHTML=html;
+}
+
+function buildLoanTable(p){
+  var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var show = p==='q1'?[0,1,2]: p==='q2'?[3,4,5]: p==='q3'?[6,7,8]: p==='q4'?[9,10,11]: months.map((_,i)=>i);
+  var html='';
+  show.forEach(function(i){
+    html+='<tr><td>'+months[i]+' 2026</td><td class="tr tnum">'+Math.round(FY.loan[i]).toLocaleString()+'</td><td class="tr neg">'+Math.round(FY.loan[i]*0.02).toLocaleString()+'</td><td class="tr fw neg">'+Math.round(FY.loan[i>0?i:0]*1.02).toLocaleString()+'</td></tr>';
+  });
+  document.getElementById('loan-tbody').innerHTML=html;
+  s('loan-tbl-title','2026 monthly accrual — '+(p==='fy'?'Full Year':'Quarter shown'));
+}
+
+function updateChart(id, data, type, horizontal){
+  if(charts[id]){ charts[id].destroy(); }
+  var ctx = document.getElementById(id);
+  if(!ctx) return;
+  var opts = {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:type==='line'||data.datasets.length>1,position:'top',labels:{font:{size:10},boxWidth:10}}},
+    scales:{
+      y:{ticks:{callback:v=>gcK(v),font:{size:10}},grid:{color:'#F0EFE9'}},
+      x:{ticks:{font:{size:10}},grid:{display:false}}
+    }
+  };
+  if(type==='doughnut'){
+    opts = {responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10}}}};
+  }
+  if(horizontal){ opts.indexAxis='y'; }
+  charts[id] = new Chart(ctx, {type:type, data:data, options:opts});
+}
+
+// ── NAVIGATION ──
+var titles={dash:'Dashboard',afs:'AFS — P&L & Balance Sheet',tb:'Trial Balance',je:'Journal Entry',imprest:'Imprest Cash Book',prod:'Production (by Insurer)',ar:'Accounts Receivables',bank:'Bank Charges',overdraft:'Overdraft Interest',loan:'Loan Schedule',tax:'Tax Credit (CIT/WHT)',ratios:'Ratios Analysis',notes:'Notes to Accounts',directors:'Directors Report'};
+
+function nav(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(b=>b.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  s('tbt',titles[id]||id);
+  if(btn) btn.classList.add('active');
+}
+
+function swTab(btn,tid){
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['afs-pl','afs-bs'].forEach(id=>{var el=document.getElementById(id);if(el)el.style.display=(id===tid)?'':'none';});
+}
+
+// ── INIT ──
+window.addEventListener('load', function(){
+  // Build initial loan table
+  buildLoanTable('fy');
+  buildProdTable(FY.insurers.v2026);
+  // Initial charts
+  updateChart('c-rev',{labels:['Motor','Fire/Theft','Life','Bonds','Engineering','Liability','Marine','Other'],datasets:[{label:'GH¢',data:FY.products,backgroundColor:['#1D9E75','#0F6E56','#FAC775','#185FA5','#9FE1CB','#6B6B68','#E1F5EE','#DC2626'],borderRadius:4,borderSkipped:false}]},'bar');
+  updateChart('c-rvx',{labels:['Commission','Investment','Exchange Loss','Expenses'],datasets:[{data:[925168,293885,183807,1113248],backgroundColor:['#1D9E75','#FAC775','#DC2626','#6B6B68'],borderWidth:2,borderColor:'#fff'}]},'doughnut');
+  updateChart('c-afs',{labels:['Commission','G&A Exp','Inv Income','Finance Cost','Tax'],datasets:[{label:'2026',data:[925168,1113248,293885,53003,65042],backgroundColor:'#1D9E75',borderRadius:3},{label:'2025',data:[925168,1089426,293885,53003,70996],backgroundColor:'#9FE1CB',borderRadius:3}]},'bar');
+  updateChart('c-prod',{labels:FY.insurers.names,datasets:[{label:'2026',data:FY.insurers.v2026,backgroundColor:'#1D9E75',borderRadius:4},{label:'2025',data:FY.insurers.v2025,backgroundColor:'#9FE1CB',borderRadius:4}]},'bar',true);
+  updateChart('c-loan',{labels:['2022','2023','2024','2025','2026'],datasets:[{label:'Accrued Interest',data:[9665,9776,12399,15724,47565],backgroundColor:['#DC2626','#DC2626','#DC2626','#DC2626','#FAC775'],borderRadius:4}]},'bar');
+  updateChart('c-ratios',{labels:['GP Margin%','Net Margin%','ROA%','Cost/Income%'],datasets:[{label:'2026',data:[100,-1.32,6.82,120.3],backgroundColor:['#1D9E75','#DC2626','#185FA5','#DC2626'],borderRadius:4},{label:'2025',data:[100,0.61,8.21,117.8],backgroundColor:'#9FE1CB',borderRadius:4}]},'bar');
+});
+</script>
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- UNIVERSAL DRAWER -->
+<div class="drawer" id="mainDrawer">
+  <div class="drawer-head">
+    <div>
+      <div class="drawer-title" id="drawerTitle">Add Entry</div>
+      <div class="drawer-sub" id="drawerSub">Fill in the details below</div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()">×</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"><!-- injected by JS --></div>
+  <div class="drawer-foot">
+    <button class="btn btn-g" onclick="closeDrawer()">Cancel</button>
+    <button class="btn-export" id="drawerPreviewBtn" onclick="previewEntry()" style="display:none;">Preview</button>
+    <button class="btn-add" id="drawerSaveBtn" onclick="saveEntry()">Save Entry</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ─── IN-MEMORY DATA STORES ─────────────────────────────────────────────────
+var DB = {
+  journal:     [],  // { date, ref, particulars, dr_account, cr_account, amount, narration }
+  imprest:     [],  // { date, chq, invoice, details, payee, category, amount }
+  production:  [],  // { insurer, product, commission, period }
+  ar:          [],  // { date, client, insurer, product, currency, fxRate, premium, status, balance, comm }
+  bank:        [],  // { date, account, currency, amount, fxRate, ghc, notes }
+  tb:          [],  // { particulars, debit, credit, notes }
+  ratios:      []   // manual override ratios
+};
+
+var curDrawer = '';
+
+// ─── DRAWER FORMS ─────────────────────────────────────────────────────────
+
+var FORMS = {
+  journal: {
+    title:'Add Journal Entry',
+    sub:'Post a new debit/credit entry to the journal',
+    fields:`
+      <div class="fg-row">
+        <div class="fg"><label>Date <span class="req">*</span></label><input class="fi" type="date" id="f-date" value="2026-04-20"></div>
+        <div class="fg"><label>Reference No. <span class="req">*</span></label><input class="fi" type="text" id="f-ref" placeholder="JNL-2026-001"></div>
+      </div>
+      <div class="fg"><label>Particulars / Description <span class="req">*</span></label><input class="fi" type="text" id="f-particulars" placeholder="e.g. Depreciation charge — Motor Vehicles"></div>
+      <div class="fg-row">
+        <div class="fg"><label>Debit Account <span class="req">*</span></label>
+          <select class="fi fi-select" id="f-dr">
+            <option value="">Select account...</option>
+            <option>Depreciation Expense</option>
+            <option>Salaries & Allowances</option>
+            <option>Business Promotion</option>
+            <option>Rent & Occupancy</option>
+            <option>Utilities</option>
+            <option>Bank Charges</option>
+            <option>Finance Charges</option>
+            <option>Fuel & Lubricants</option>
+            <option>Motor Vehicles (Asset)</option>
+            <option>Cash at Bank</option>
+            <option>Commissions Receivable</option>
+            <option>Income Tax Expense</option>
+            <option>Other Expense</option>
+          </select>
+        </div>
+        <div class="fg"><label>Credit Account <span class="req">*</span></label>
+          <select class="fi fi-select" id="f-cr">
+            <option value="">Select account...</option>
+            <option>Accumulated Depreciation — Motor Vehicles</option>
+            <option>Accumulated Depreciation — Plant & Machinery</option>
+            <option>Accumulated Depreciation — Furniture</option>
+            <option>Accumulated Depreciation — Computer</option>
+            <option>Amortisation — Intangibles</option>
+            <option>Accrual Liabilities</option>
+            <option>Cash at Bank</option>
+            <option>Commission Revenue</option>
+            <option>Investment Income</option>
+            <option>Income Tax Payable</option>
+            <option>Trade Creditors</option>
+            <option>Other Income</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Amount (GH¢) <span class="req">*</span></label><input class="fi" type="number" id="f-amount" placeholder="0.00" step="0.01"></div>
+        <div class="fg"><label>Entry type</label>
+          <select class="fi fi-select" id="f-type">
+            <option value="journal">Journal Entry</option>
+            <option value="adjustment">Audit Adjustment</option>
+            <option value="correction">Correction</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>Narration / Notes</label><textarea class="fi" id="f-narration" rows="3" placeholder="Explain the purpose of this entry..."></textarea></div>
+      <div class="fg"><label>Supporting document (optional)</label>
+        <div class="file-drop" id="f-file-drop" onclick="document.getElementById('f-file').click()" ondragover="this.classList.add('drag');event.preventDefault()" ondragleave="this.classList.remove('drag')" ondrop="handleFileDrop(event)">
+          <input type="file" id="f-file" accept=".pdf,.xlsx,.jpg,.png" onchange="showFileName(this)">
+          <div class="file-drop-icon">📎</div>
+          <div class="file-drop-txt"><strong>Click to attach</strong> or drag &amp; drop<br>PDF, Excel, or image</div>
+          <div id="f-file-name" style="font-size:12px;color:var(--teal-mid);margin-top:6px;"></div>
+        </div>
+      </div>
+    `
+  },
+  imprest: {
+    title:'Add Imprest Transaction',
+    sub:'Record a petty cash receipt or payment',
+    fields:`
+      <div class="fg-row">
+        <div class="fg"><label>Date <span class="req">*</span></label><input class="fi" type="date" id="f-date" value="2026-04-20"></div>
+        <div class="fg"><label>CHQ / Voucher No.</label><input class="fi" type="text" id="f-chq" placeholder="CHQ-001"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Invoice No.</label><input class="fi" type="text" id="f-invoice" placeholder="INV-2026-001"></div>
+        <div class="fg"><label>Payee Name <span class="req">*</span></label><input class="fi" type="text" id="f-payee" placeholder="Supplier / Staff name"></div>
+      </div>
+      <div class="fg"><label>Description / Details <span class="req">*</span></label><input class="fi" type="text" id="f-details" placeholder="e.g. Fuel for office vehicle"></div>
+      <div class="fg-row">
+        <div class="fg"><label>Expense Category <span class="req">*</span></label>
+          <select class="fi fi-select" id="f-category">
+            <option value="">Select...</option>
+            <option>Printing & Stationery</option>
+            <option>Communication</option>
+            <option>Utilities</option>
+            <option>Levies & Licensing</option>
+            <option>Fuel & Lubricants</option>
+            <option>Travelling & Transport</option>
+            <option>Repairs & Maintenance</option>
+            <option>Rent & Occupancy</option>
+            <option>Refreshment & Entertainment</option>
+            <option>Office Supplies</option>
+            <option>MOMO Charge</option>
+            <option>Commission Allowance</option>
+          </select>
+        </div>
+        <div class="fg"><label>Amount (GH¢) <span class="req">*</span></label><input class="fi" type="number" id="f-amount" placeholder="0.00" step="0.01"></div>
+      </div>
+      <div class="fg"><label>Transaction type</label>
+        <select class="fi fi-select" id="f-txtype">
+          <option value="payment">Payment (Cash Out)</option>
+          <option value="receipt">Receipt (Cash In)</option>
+        </select>
+      </div>
+      <div class="fg"><label>Supporting document (optional)</label>
+        <div class="file-drop" onclick="document.getElementById('f-file').click()">
+          <input type="file" id="f-file" accept=".pdf,.xlsx,.jpg,.png" onchange="showFileName(this)">
+          <div class="file-drop-icon">🧾</div>
+          <div class="file-drop-txt"><strong>Attach receipt</strong> or invoice<br>PDF, Excel, or image</div>
+          <div id="f-file-name" style="font-size:12px;color:var(--teal-mid);margin-top:6px;"></div>
+        </div>
+      </div>
+    `
+  },
+  production: {
+    title:'Add Production Entry',
+    sub:'Record commission earned from an insurer',
+    fields:`
+      <div class="fg-row">
+        <div class="fg"><label>Policy / Transaction Date <span class="req">*</span></label><input class="fi" type="date" id="f-date" value="2026-04-20"></div>
+        <div class="fg"><label>Reference / Policy No.</label><input class="fi" type="text" id="f-ref" placeholder="POL-2026-XXXX"></div>
+      </div>
+      <div class="fg"><label>Insurer Name <span class="req">*</span></label>
+        <select class="fi fi-select" id="f-insurer">
+          <option value="">Select insurer...</option>
+          <option>Enterprise Insurance Company</option>
+          <option>Serene Insurance Company</option>
+          <option>Enterprise Life Insurance Company</option>
+          <option>Provident Insurance Company</option>
+          <option>Allianz Life Insurance Company</option>
+          <option>Coronation Insurance Company</option>
+          <option>Vanguard Insurance Company</option>
+          <option>Phoenix Insurance Company</option>
+          <option>GLICO Insurance Company</option>
+          <option>State Insurance Company PLC</option>
+          <option>Loyalty Insurance Company</option>
+          <option>Star Insurance Company</option>
+          <option>Quality Insurance Company</option>
+          <option>Donewell Insurance Company</option>
+          <option>MiLife Insurance Company</option>
+          <option>MetLife Insurance Company</option>
+          <option>Hollard Insurance Company</option>
+          <option>Priority Insurance Company</option>
+          <option>SUNU Insurance Company</option>
+          <option>Other (specify below)</option>
+        </select>
+      </div>
+      <div class="fg" id="f-insurer-other-wrap" style="display:none;"><label>Other insurer name</label><input class="fi" type="text" id="f-insurer-other" placeholder="Enter insurer name"></div>
+      <div class="fg-row">
+        <div class="fg"><label>Product Line <span class="req">*</span></label>
+          <select class="fi fi-select" id="f-product">
+            <option>Motor</option>
+            <option>Fire, Theft & Property</option>
+            <option>Life Insurance</option>
+            <option>Financial Guarantees & Bonds</option>
+            <option>Engineering</option>
+            <option>Marine & Aviation</option>
+            <option>Liability</option>
+            <option>Personal Accident & Health</option>
+            <option>Other Short Term</option>
+          </select>
+        </div>
+        <div class="fg"><label>Period / Quarter</label>
+          <select class="fi fi-select" id="f-period">
+            <option>Q1 2026 (Jan–Mar)</option>
+            <option>Q2 2026 (Apr–Jun)</option>
+            <option>Q3 2026 (Jul–Sep)</option>
+            <option>Q4 2026 (Oct–Dec)</option>
+            <option>Full Year 2026</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Premium (GH¢)</label><input class="fi" type="number" id="f-premium" placeholder="0.00"></div>
+        <div class="fg"><label>Commission earned (GH¢) <span class="req">*</span></label><input class="fi" type="number" id="f-amount" placeholder="0.00" step="0.01"></div>
+      </div>
+      <div class="fg"><label>Client name (optional)</label><input class="fi" type="text" id="f-client" placeholder="e.g. Kofi Mensah / ABC Ltd"></div>
+    `
+  },
+  ar: {
+    title:'Add Accounts Receivable',
+    sub:'Record a new outstanding commission or premium',
+    fields:`
+      <div class="fg-row">
+        <div class="fg"><label>Effective Date <span class="req">*</span></label><input class="fi" type="date" id="f-date" value="2026-04-20"></div>
+        <div class="fg"><label>Client Name <span class="req">*</span></label><input class="fi" type="text" id="f-client" placeholder="Client or company name"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Insurer</label><input class="fi" type="text" id="f-insurer" placeholder="Insurer name"></div>
+        <div class="fg"><label>Product</label>
+          <select class="fi fi-select" id="f-product">
+            <option>Motor</option><option>Fire & Property</option><option>Life</option>
+            <option>Engineering</option><option>Bonds</option><option>Marine</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg-row3">
+        <div class="fg"><label>Currency</label>
+          <select class="fi fi-select" id="f-currency"><option>GH¢</option><option>USD</option><option>EUR</option><option>GBP</option></select>
+        </div>
+        <div class="fg"><label>FX Rate</label><input class="fi" type="number" id="f-fxrate" placeholder="1.00" value="1" step="0.0001"></div>
+        <div class="fg"><label>Sum Insured</label><input class="fi" type="number" id="f-suminsured" placeholder="0"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Premium (GH¢) <span class="req">*</span></label><input class="fi" type="number" id="f-premium" placeholder="0.00"></div>
+        <div class="fg"><label>Commission (GH¢)</label><input class="fi" type="number" id="f-amount" placeholder="0.00"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Outstanding Balance (GH¢) <span class="req">*</span></label><input class="fi" type="number" id="f-balance" placeholder="0.00"></div>
+        <div class="fg"><label>Status</label>
+          <select class="fi fi-select" id="f-status"><option>Pending</option><option>Partial</option><option>Collected</option><option>Disputed</option></select>
+        </div>
+      </div>
+    `
+  },
+  bank: {
+    title:'Add Bank Transaction',
+    sub:'Record a bank entry or reconciliation item',
+    fields:`
+      <div class="fg-row">
+        <div class="fg"><label>Transaction Date <span class="req">*</span></label><input class="fi" type="date" id="f-date" value="2026-04-20"></div>
+        <div class="fg"><label>Account <span class="req">*</span></label>
+          <select class="fi fi-select" id="f-account">
+            <option>Fidelity Bank USD — Acct 11</option>
+            <option>Fidelity Bank USD — FBL 19</option>
+            <option>Ecobank GH¢</option>
+            <option>Ecobank EUR</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Currency</label>
+          <select class="fi fi-select" id="f-currency"><option>GH¢</option><option>USD</option><option>EUR</option></select>
+        </div>
+        <div class="fg"><label>FX Rate</label><input class="fi" type="number" id="f-fxrate" placeholder="1.00" step="0.0001" value="1"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Amount (foreign) <span class="req">*</span></label><input class="fi" type="number" id="f-amount" placeholder="0.00"></div>
+        <div class="fg"><label>GH¢ Equivalent</label><input class="fi" type="number" id="f-ghc" placeholder="Auto-calc" readonly style="background:#F9F9F7;"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Transaction type</label>
+          <select class="fi fi-select" id="f-txtype"><option>Credit (Deposit)</option><option>Debit (Withdrawal)</option><option>Bank Charge</option><option>Interest Charged</option></select>
+        </div>
+        <div class="fg"><label>Reference</label><input class="fi" type="text" id="f-ref" placeholder="Bank ref / CHQ no."></div>
+      </div>
+      <div class="fg"><label>Notes</label><input class="fi" type="text" id="f-notes" placeholder="Brief description"></div>
+    `
+  },
+  tb: {
+    title:'Add Trial Balance Adjustment',
+    sub:'Post an adjustment to the trial balance',
+    fields:`
+      <div class="fg"><label>Account / Particulars <span class="req">*</span></label><input class="fi" type="text" id="f-particulars" placeholder="e.g. Accrued Audit Fees"></div>
+      <div class="fg-row">
+        <div class="fg"><label>Debit (GH¢)</label><input class="fi" type="number" id="f-debit" placeholder="0.00" step="0.01"></div>
+        <div class="fg"><label>Credit (GH¢)</label><input class="fi" type="number" id="f-credit" placeholder="0.00" step="0.01"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Period</label>
+          <select class="fi fi-select" id="f-period">
+            <option>2026</option><option>2025</option><option>Both</option>
+          </select>
+        </div>
+        <div class="fg"><label>Adjustment type</label>
+          <select class="fi fi-select" id="f-adjtype">
+            <option>Audit Adjustment</option><option>Journal Entry</option><option>Reclassification</option><option>Accrual</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>Notes / Narration</label><textarea class="fi" id="f-notes" rows="2" placeholder="Reason for this adjustment..."></textarea></div>
+    `
+  }
+};
+
+// ─── OPEN / CLOSE DRAWER ────────────────────────────────────────────────────
+function openDrawer(type) {
+  curDrawer = type;
+  var form = FORMS[type];
+  document.getElementById('drawerTitle').textContent = form.title;
+  document.getElementById('drawerSub').textContent = form.sub;
+  document.getElementById('drawerBody').innerHTML = form.fields;
+  document.getElementById('mainDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  // wire up FX auto-calc for bank
+  if(type==='bank') {
+    var amt = document.getElementById('f-amount');
+    var fx  = document.getElementById('f-fxrate');
+    var ghc = document.getElementById('f-ghc');
+    if(amt && fx && ghc) {
+      var calc = function(){ ghc.value = (parseFloat(amt.value||0)*parseFloat(fx.value||1)).toFixed(2); };
+      amt.addEventListener('input', calc); fx.addEventListener('input', calc);
+    }
+  }
+  // show other insurer field
+  if(type==='production') {
+    var sel = document.getElementById('f-insurer');
+    if(sel) sel.addEventListener('change', function(){
+      document.getElementById('f-insurer-other-wrap').style.display = this.value==='Other (specify below)'?'block':'none';
+    });
+  }
+}
+
+function closeDrawer() {
+  document.getElementById('mainDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  curDrawer = '';
+}
+
+// ─── SAVE ENTRY ─────────────────────────────────────────────────────────────
+function saveEntry() {
+  var entry = {};
+  var ok = true;
+  // collect all fi inputs in the drawer
+  document.querySelectorAll('#drawerBody .fi').forEach(function(el) {
+    if(el.id) entry[el.id.replace('f-','')] = el.value;
+    if(el.required && !el.value) ok = false;
+  });
+  if(!entry.amount && !entry.credit && !entry.balance) { showToast('⚠ Please enter an amount','error'); return; }
+  entry._ts = new Date().toLocaleString();
+  DB[curDrawer].push(entry);
+  renderNewRow(curDrawer, entry);
+  showToast('✓ Entry saved successfully');
+  closeDrawer();
+}
+
+// ─── RENDER NEW TABLE ROW ───────────────────────────────────────────────────
+function renderNewRow(type, e) {
+  var tbody, html = '';
+  if(type==='journal') {
+    tbody = document.getElementById('je-tbody');
+    if(!tbody) return;
+    html = '<tr class="new-row"><td>'+e.date+'</td><td>'+e.ref+'</td><td>'+e.particulars+'</td><td class="tr tnum pos">'+fmt2(e.amount)+'</td><td class="tbl-m">'+e.dr+'</td><td class="tbl-m">'+e.cr+'</td><td class="tbl-m" style="font-size:11px;">'+e.narration+'</td><td class="tbl-m" style="font-size:11px;">'+e.type+'</td></tr>';
+  } else if(type==='imprest') {
+    tbody = document.getElementById('imprest-tbody');
+    if(!tbody) return;
+    var cls = e.txtype==='receipt'?'pos':'neg';
+    html = '<tr class="new-row"><td>'+e.date+'</td><td>'+e.chq+'</td><td>'+e.invoice+'</td><td>'+e.details+'</td><td>'+e.payee+'</td><td><span class="pill p-blue"><span class="pd"></span>'+e.category+'</span></td><td class="tr tnum '+cls+'">'+fmt2(e.amount)+'</td><td class="tbl-m">'+e.txtype+'</td></tr>';
+  } else if(type==='production') {
+    tbody = document.getElementById('prod-tbody');
+    if(!tbody) return;
+    var ins = e.insurer==='Other (specify below)'?(e['insurer-other']||'Other'):e.insurer;
+    html = '<tr class="new-row"><td>'+ins+'</td><td class="tr tnum fw pos">'+fmt2(e.amount)+'</td><td class="tr tm">New entry</td><td class="tr pos">↑ New</td><td><div class="pb"><div class="pf" style="width:10%"></div></div></td></tr>';
+  } else if(type==='ar') {
+    tbody = document.getElementById('ar-tbody');
+    if(!tbody) return;
+    html = '<tr class="new-row"><td>'+e.date+'</td><td>'+e.client+'</td><td>'+e.insurer+'</td><td>'+e.product+'</td><td>'+e.currency+'</td><td class="tr">'+e.fxrate+'</td><td class="tr fw">'+fmt2(e.premium)+'</td><td><span class="pill p-warn"><span class="pd"></span>'+e.status+'</span></td><td class="tr fw neg">'+fmt2(e.balance)+'</td><td class="tr">'+fmt2(e.amount)+'</td></tr>';
+  } else if(type==='bank') {
+    tbody = document.getElementById('bank-tbody');
+    if(!tbody) return;
+    var cls2 = e.txtype==='Credit (Deposit)'?'pos':'neg';
+    html = '<tr class="new-row"><td>'+e.date+'</td><td>'+e.account+'</td><td>'+e.currency+'</td><td class="tr tnum">'+fmt2(e.amount)+'</td><td class="tr">'+e.fxrate+'</td><td class="tr fw '+cls2+'">'+fmt2(e.ghc||e.amount)+'</td><td class="tbl-m">'+e.notes+'</td></tr>';
+  } else if(type==='tb') {
+    tbody = document.getElementById('tb-tbody-adj');
+    if(!tbody) return;
+    html = '<tr class="new-row"><td>'+e.particulars+'</td><td class="tr tnum pos">'+fmt2(e.debit)+'</td><td class="tr tnum neg">'+fmt2(e.credit)+'</td><td class="tbl-m">'+e.period+'</td><td class="tbl-m" style="font-size:11px;">'+e.adjtype+'</td><td class="tbl-m" style="font-size:11px;">'+e.notes+'</td></tr>';
+  }
+  if(tbody && html) tbody.insertAdjacentHTML('afterbegin', html);
+  // update count badge
+  var badge = document.getElementById('count-'+type);
+  if(badge) badge.textContent = DB[type].length + ' entr' + (DB[type].length===1?'y':'ies');
+}
+
+function fmt2(v) { return v?parseFloat(v).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}):'-'; }
+
+// ─── EXPORT TO EXCEL ────────────────────────────────────────────────────────
+function exportSection(type) {
+  var wb = XLSX.utils.book_new();
+  var sheetData = buildSheetData(type);
+  if(!sheetData || !sheetData.length) { showToast('⚠ No data to export yet'); return; }
+  var ws = XLSX.utils.aoa_to_sheet(sheetData);
+  XLSX.utils.book_append_sheet(wb, ws, type.toUpperCase());
+  XLSX.writeFile(wb, 'Planwell_'+type+'_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  showToast('✓ Exported to Excel');
+}
+
+function exportAll() {
+  var wb = XLSX.utils.book_new();
+  // Trial Balance
+  var tbData = [
+    ['PLANWELL INSURANCE BROKERS LIMITED'],['TRIAL BALANCE — 31 DECEMBER 2026'],[''],
+    ['Particulars','2025 (GH¢)','2026 (GH¢)','Movement'],
+    ['Plant and Machinery','74775','74775','—'],
+    ['Motor Vehicles','356394','356394','—'],
+    ['Accumulated Depreciation - Motor','-299371','-313627','-14256'],
+    ['Cash at Bank','354392','354392','—'],
+    ['Commissions Receivable','209821','209821','—'],
+    ['Interest Receivable','538089','538089','—'],
+    ['Stated Capital','-1215994','-1215994','—'],
+    ['Retained Earnings','-98567','-110807','-12240'],
+    ['Motor Commission','-392063','-392063','—'],
+    ['Fire/Theft Commission','-180912','-180912','—'],
+    ['Life Commission','-151793','-151793','—'],
+    ['Investment Income','-293885','-293885','—']
+  ];
+  // append any TB adjustments
+  DB.tb.forEach(function(e){ tbData.push([e.particulars, e.debit||0, e.credit||0, e.adjtype]); });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(tbData), 'TRIAL BALANCE');
+
+  // Journal Entry
+  var jeData = [
+    ['PLANWELL INSURANCE BROKERS LIMITED'],['JOURNAL ENTRIES — 2026'],[''],
+    ['Date','Reference','Particulars','Dr Account','Cr Account','Amount (GH¢)','Type','Narration']
+  ];
+  DB.journal.forEach(function(e){ jeData.push([e.date,e.ref,e.particulars,e.dr,e.cr,e.amount,e.type,e.narration]); });
+  if(DB.journal.length===0) jeData.push(['No entries added yet','','','','','','','']);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(jeData), 'JOURNAL ENTRY');
+
+  // Imprest
+  var imData = [
+    ['PLANWELL INSURANCE BROKERS LIMITED'],['IMPREST CASH BOOK — 2026'],[''],
+    ['Date','CHQ No.','Invoice No.','Details','Payee','Category','Amount (GH¢)','Type']
+  ];
+  DB.imprest.forEach(function(e){ imData.push([e.date,e.chq,e.invoice,e.details,e.payee,e.category,e.amount,e.txtype]); });
+  if(DB.imprest.length===0) imData.push(['No entries added yet','','','','','','','']);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(imData), 'IMPREST CASH BOOK');
+
+  // Production
+  var prodData = [
+    ['PLANWELL INSURANCE BROKERS LIMITED'],['COMMISSION BY INSURER — 2026'],[''],
+    ['Insurer','Product','Commission (GH¢)','Period','Client']
+  ];
+  DB.production.forEach(function(e){ prodData.push([e.insurer,e.product,e.amount,e.period,e.client]); });
+  // append existing data
+  [['Enterprise Insurance','Multiple',372254,'Full Year'],['Serene Insurance','Motor',154725,'Full Year'],['Enterprise Life','Life',91579,'Full Year']].forEach(function(r){ prodData.push(r); });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(prodData), 'PRODUCTION');
+
+  // AR
+  var arData = [
+    ['PLANWELL INSURANCE BROKERS LIMITED'],['ACCOUNTS RECEIVABLES — 2026'],[''],
+    ['Date','Client','Insurer','Product','Currency','FX Rate','Premium (GH¢)','Status','Balance (GH¢)','Commission']
+  ];
+  arData.push(['09 May 2025','Global Wheels','Loyalty','Goods in Transit','USD',14,39100,'Pending',7820,20000]);
+  arData.push(['09 May 2025','Electricity Co. Ghana','—','Various','GH¢',1,631136,'Pending',127464,4000]);
+  DB.ar.forEach(function(e){ arData.push([e.date,e.client,e.insurer,e.product,e.currency,e.fxrate,e.premium,e.status,e.balance,e.amount]); });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(arData), 'ACCOUNTS RECEIVABLES');
+
+  // Bank
+  var bankData = [
+    ['PLANWELL INSURANCE BROKERS LIMITED'],['BANK RECONCILIATION — 2026'],[''],
+    ['Date','Account','Currency','Foreign Amount','FX Rate','GH¢ Equivalent','Type','Notes'],
+    ['-','Fidelity USD Acct 11','USD',57.32,10.45,599,'Balance','Year-end'],
+    ['-','Fidelity USD FBL 19','USD',33300,10.45,347985,'Fixed Deposit','-'],
+    ['-','Ecobank GH¢','GH¢',440.51,1,441,'Current','-'],
+    ['-','Ecobank EUR','EUR',437.37,12.2728,5368,'Current','-'],
+    ['','TOTAL','','','','354392','',''],
+    ['','OVERDRAFT','','','','-260077','','']
+  ];
+  DB.bank.forEach(function(e){ bankData.push([e.date,e.account,e.currency,e.amount,e.fxrate,e.ghc||e.amount,e.txtype,e.notes]); });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(bankData), 'BANK CHARGES');
+
+  // AFS
+  var afsData = [
+    ['PLANWELL INSURANCE BROKERS LIMITED'],['STATEMENT OF PROFIT OR LOSS — YEAR ENDED 31 DECEMBER 2026'],[''],
+    ['','Note','2026 (GH¢)','2025 (GH¢)'],
+    ['Commission Revenue','5',925168,925168],
+    ['Gross profit','',925168,925168],
+    ['G&A Expenses','6',-1113248,-1089426],
+    ['Operating Loss','',-188080,-164258],
+    ['Investment Income','7',293885,293885],
+    ['PBIT','',105805,129627],
+    ['Finance Cost','8',-53003,-53003],
+    ['Profit/(Loss) Before Tax','',52802,76624],
+    ['Tax Expense','9',-65042,-70996],
+    ['Profit/(Loss) After Tax','',-12240,5628],
+    [''],
+    ['Opening Retained Earnings','',-98567,-104194],
+    ['Closing Retained Earnings','',-110807,-98567]
+  ];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(afsData), 'AFS');
+
+  XLSX.writeFile(wb, 'Planwell_Financial_Statements_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  showToast('✓ All sheets exported to Excel');
+}
+
+function buildSheetData(type) {
+  if(type==='journal') {
+    var rows=[['Date','Reference','Particulars','Dr Account','Cr Account','Amount (GH¢)','Type','Narration']];
+    DB.journal.forEach(function(e){ rows.push([e.date,e.ref,e.particulars,e.dr,e.cr,e.amount,e.type,e.narration]); });
+    return rows;
+  }
+  if(type==='imprest') {
+    var rows=[['Date','CHQ No.','Invoice No.','Details','Payee','Category','Amount (GH¢)','Type']];
+    DB.imprest.forEach(function(e){ rows.push([e.date,e.chq,e.invoice,e.details,e.payee,e.category,e.amount,e.txtype]); });
+    return rows;
+  }
+  return [];
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────
+function showFileName(input) {
+  var fn = document.getElementById('f-file-name');
+  if(fn && input.files[0]) fn.textContent = '📎 ' + input.files[0].name;
+}
+function handleFileDrop(e) {
+  e.preventDefault(); e.currentTarget.classList.remove('drag');
+  var fn = document.getElementById('f-file-name');
+  if(fn && e.dataTransfer.files[0]) fn.textContent = '📎 ' + e.dataTransfer.files[0].name;
+}
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type==='error'?'#DC2626':'#04342C';
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+function previewEntry() {
+  var fields = {};
+  document.querySelectorAll('#drawerBody .fi').forEach(function(el){ if(el.id) fields[el.id.replace('f-','')] = el.value; });
+  var html = '<div class="entry-preview"><strong>Preview:</strong><br>';
+  Object.keys(fields).forEach(function(k){ if(fields[k]) html += '<strong>'+k+':</strong> '+fields[k]+'<br>'; });
+  html += '</div>';
+  var old = document.getElementById('entry-preview-block');
+  if(old) old.remove();
+  var block = document.createElement('div'); block.id='entry-preview-block'; block.innerHTML=html;
+  document.getElementById('drawerBody').appendChild(block);
+}
+</script>
+</body>
+</html>
